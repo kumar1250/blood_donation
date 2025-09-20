@@ -1,3 +1,4 @@
+# blood_requests/views.py
 import random
 from datetime import timedelta
 from django.utils import timezone
@@ -9,7 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 
 from .models import BloodRequest, Notification
-from .forms import BloodRequestForm, OTPForm  # ✅ only import the correct forms
+from .forms import BloodRequestForm, OTPForm
+from chat.models import ChatMessage   # ✅ Import your chat model
 
 User = get_user_model()
 
@@ -19,13 +21,12 @@ def _generate_otp():
     return f"{random.randint(100000, 999999):06d}"
 
 
-# ✅ Create blood request
-
 # ✅ List all requests
 @login_required
 def request_list(request):
     requests = BloodRequest.objects.all().order_by("-created_at")
     return render(request, "blood_requests/request_list.html", {"requests": requests})
+
 
 @login_required
 def create_request(request):
@@ -34,14 +35,14 @@ def create_request(request):
         form = BloodRequestForm(request.POST)
         if form.is_valid():
             br = form.save(commit=False)
-            br.requester = request.user  # ✅ Assign logged-in user
+            br.requester = request.user
             br.save()
             messages.success(request, "✅ Blood request created successfully!")
             return redirect("request_list")
     return render(request, "blood_requests/request_form.html", {"form": form})
 
 
-# ✅ Accept a request (send OTP)
+# ✅ Accept a request (send OTP + phone + address + share to chat)
 @login_required
 def accept_request(request, request_id):
     br = get_object_or_404(BloodRequest, id=request_id)
@@ -54,23 +55,38 @@ def accept_request(request, request_id):
     br.otp_verified = False
     br.save()
 
-    # Send OTP email
+    # Build message
     subject = "Your Blood Request OTP (verify to confirm donor)"
     message = (
         f"Hello {br.name},\n\n"
-        f"{request.user.username} has accepted to be a donor for your request.\n"
-        f"Please verify using this OTP: {otp}\n\n"
+        f"{request.user.username} has accepted to be a donor for your request.\n\n"
+        f"📌 OTP: {otp}\n"
+        f"📞 Donor Phone: {getattr(request.user, 'phone', 'N/A')}\n"
+        f"🏠 Donor Address: {getattr(request.user, 'address', 'N/A')}\n\n"
         f"Regards,\nBlood Donation Team"
     )
+
+    # Send OTP email
     try:
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [br.email])
-        messages.info(request, "📧 OTP has been sent to the requester email.")
+        messages.info(request, "📧 OTP + donor details have been sent to the requester email.")
     except Exception as e:
         messages.error(request, f"Email sending failed: {e}")
+
+    # ✅ Also send same message into chat
+    try:
+        ChatMessage.objects.create(
+            sender=request.user,
+            receiver=br.requester,
+            message=f"🔑 OTP: {otp}\n📞 Phone: {getattr(request.user, 'phone', 'N/A')}\n🏠 Address: {getattr(request.user, 'address', 'N/A')}"
+        )
+    except Exception as e:
+        print("Chat save error:", e)
 
     return redirect("verify_otp", request_id=br.id)
 
 
+# ✅ Verify OTP
 # ✅ Verify OTP
 @login_required
 def verify_otp(request, request_id):
@@ -88,6 +104,7 @@ def verify_otp(request, request_id):
                 and br.otp_created_at
                 and timezone.now() - br.otp_created_at <= timedelta(minutes=15)
             ):
+                # ✅ OTP is correct → delete request after confirming
                 br.otp_verified = True
                 br.save()
 
@@ -118,7 +135,10 @@ def verify_otp(request, request_id):
                     for u in same_users:
                         Notification.objects.create(user=u, message=notif_msg)
 
-                messages.success(request, "✅ OTP verified and donor confirmed.")
+                # ✅ Delete the request after success
+                br.delete()
+
+                messages.success(request, "✅ OTP verified, donor confirmed & request closed.")
                 return redirect("request_list")
             else:
                 messages.error(request, "❌ Invalid or expired OTP.")
