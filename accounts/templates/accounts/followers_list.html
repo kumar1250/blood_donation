@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Followers & Following{% endblock %}
+
+{% block content %}
+<h2>👥 Followers & Following</h2>
+
+<h3>Followers</h3>
+<ul>
+  {% for f in followers %}
+    <li>{{ f.follower.username }}
+      <a href="#">💬 Chat</a>
+    </li>
+  {% empty %}
+    <li>No followers yet</li>
+  {% endfor %}
+</ul>
+
+<h3>Following</h3>
+<ul>
+  {% for f in following %}
+    <li>{{ f.following.username }}
+      <a href="#">💬 Chat</a>
+    </li>
+  {% empty %}
+    <li>You are not following anyone</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'home' %}">⬅ Back to Home</a>
+{% endblock %}

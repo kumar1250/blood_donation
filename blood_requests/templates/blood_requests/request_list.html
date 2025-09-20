@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Blood Requests{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>All Blood Requests</h2>
+    <a href="{% url 'create_request' %}" class="btn btn-success mb-3">+ New Request</a>
+
+    <ul class="list-group">
+        {% for r in requests %}
+            <li class="list-group-item">
+                <strong>{{ r.name }}</strong> - {{ r.blood_group }}<br>
+                Address: {{ r.address }}<br>
+                {% if r.reason %} Reason: {{ r.reason }}<br>{% endif %}
+                <a href="{% url 'accept_request' r.id %}" class="btn btn-sm btn-primary mt-1">Accept</a>
+                <a href="{% url 'verify_otp' r.id %}" class="btn btn-sm btn-warning mt-1">Verify OTP</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">No requests available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

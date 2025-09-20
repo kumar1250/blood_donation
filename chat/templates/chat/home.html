@@ -1,0 +1,22 @@
+{% extends "chat/base.html" %}
+
+{% block title %}Chat Home{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2>💬 Users to Chat With</h2>
+
+    {% if users %}
+        <ul class="list-group">
+            {% for user in users %}
+                <li class="list-group-item">
+                    <a href="{% url 'chat' user.username %}">{{ user.username }}</a>
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">No other users available to chat.</p>
+    {% endif %}
+</div>
+{% endblock %}

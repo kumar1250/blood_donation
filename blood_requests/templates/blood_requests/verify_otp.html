@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+</head>
+<body>
+    <h2>🔑 Verify OTP for Blood Request</h2>
+
+    <p>
+        Requester: <strong>{{ br.name }}</strong><br>
+        Blood Group: <strong>{{ br.blood_group }}</strong><br>
+        Address: <strong>{{ br.address }}</strong>
+    </p>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li {% if message.tags %}class="{{ message.tags }}"{% endif %}>
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Verify OTP</button>
+    </form>
+
+    <p><a href="{% url 'request_list' %}">⬅ Back to Requests</a></p>
+</body>
+</html>

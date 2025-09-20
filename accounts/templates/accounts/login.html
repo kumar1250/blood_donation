@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h2>🔑 Login</h2>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post" autocomplete="off">
+  {% csrf_token %}
+  <label>Username:</label><br>
+  <input type="text" name="username" value="{{ username|default:'' }}" required><br><br>
+
+  <label>Password:</label><br>
+  <input type="password" name="password" required><br><br>
+
+  <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+<p><a href="{% url 'forgot_password' %}">Forgot Password?</a></p>
+<p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
+{% endblock %}
