@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Create Blood Camp{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">🩸 Create New Blood Camp</h2>
+    <form method="POST" class="mt-3">
+        {% csrf_token %}
+
+        <!-- Render all fields except permanent -->
+        {% for field in form %}
+            {% if field.name != "permanent" %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Permanent checkbox -->
+        <div class="form-check mb-3">
+            {{ form.permanent }}
+            <label class="form-check-label" for="{{ form.permanent.id_for_label }}">
+                Permanent Camp (Never Expires)
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-red w-100">Create Camp</button>
+        <a href="{% url 'blood_camp:camp_list' %}" class="btn btn-secondary w-100 mt-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

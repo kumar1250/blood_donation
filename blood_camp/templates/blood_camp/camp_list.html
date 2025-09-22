@@ -1,0 +1,110 @@
+  {% extends 'base.html' %}
+{% block title %}All Blood Camps{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4" style="height: 90vh;">
+    <div class="row h-100">
+        <!-- Left side: Camp list -->
+        <div class="col-md-4 h-100 overflow-auto" style="background:#fff0f0; padding:20px; border-right:1px solid #ddd;">
+            <h3 class="mb-3 text-danger fw-bold">All Upcoming Blood Camps</h3>
+
+            <!-- Search form -->
+            <form method="GET" class="mb-3">
+                <input type="text" name="city" value="{{ city|default:'' }}" placeholder="Enter city" class="form-control mb-2">
+                <button type="submit" class="btn btn-danger w-100 fw-bold">Search</button>
+            </form>
+
+            <!-- Camp list -->
+            {% if camps %}
+                <div class="list-group">
+                    {% for camp in camps %}
+                        <button class="list-group-item list-group-item-action mb-2 text-start border border-danger"
+                                onclick="focusCamp({{ camp.id }})">
+                            <div class="fw-bold text-danger">{{ camp.name }}</div>
+                            <small>📍 {{ camp.city }} | 📅 {{ camp.date }}</small>
+                        </button>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No camps found.</p>
+            {% endif %}
+
+            <!-- Arrow controls for map panning -->
+            <div class="mt-3 text-center">
+                <button class="btn btn-sm btn-outline-danger mb-1 fw-bold" onclick="panMap(0, -50)">↑</button><br>
+                <button class="btn btn-sm btn-outline-danger fw-bold" onclick="panMap(-50, 0)">←</button>
+                <button class="btn btn-sm btn-outline-danger fw-bold" onclick="panMap(50, 0)">→</button><br>
+                <button class="btn btn-sm btn-outline-danger mt-1 fw-bold" onclick="panMap(0, 50)">↓</button>
+            </div>
+        </div>
+
+        <!-- Right side: Map -->
+        <div class="col-md-8 h-100 p-0">
+            <div id="map" style="height: 100%; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map', {
+        center: [20.5937, 78.9629],
+        zoom: 5,
+        scrollWheelZoom: true,
+        dragging: true,
+        zoomControl: false  // disable default zoom control
+    });
+
+    // Add zoom control manually beside arrows (top-left)
+    L.control.zoom({
+        position: 'topleft'  // you can change to 'topright', 'bottomleft', 'bottomright'
+    }).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    var markers = {};
+
+    {% for camp in camps %}
+        {% if camp.latitude and camp.longitude %}
+            var popupContent = `
+                <div style="max-width: 300px; font-family:sans-serif;">
+                    <h5 class="text-danger fw-bold">{{ camp.name }}</h5>
+                    <p>
+                        <strong>Organized by:</strong> {{ camp.organized_by }}<br>
+                        <strong>Date & Time:</strong> {{ camp.date }} at {{ camp.time }}<br>
+                        <strong>Venue:</strong> {{ camp.venue }}<br>
+                        <strong>City:</strong> {{ camp.city }}<br>
+                        <strong>Contact:</strong> {{ camp.contact_person }} ({{ camp.contact_phone }})<br>
+                        <strong>Age Range:</strong> {{ camp.min_age }} - {{ camp.max_age }} yrs<br>
+                        <strong>Min Weight:</strong> {{ camp.min_weight }} kg<br>
+                        <strong>Notes:</strong> {{ camp.notes|default:"N/A" }}
+                    </p>
+                </div>
+            `;
+            markers[{{ camp.id }}] = L.marker([{{ camp.latitude }}, {{ camp.longitude }}])
+                .addTo(map)
+                .bindPopup(popupContent);
+        {% endif %}
+    {% endfor %}
+
+    function focusCamp(campId) {
+        var marker = markers[campId];
+        if(marker){
+            map.setView(marker.getLatLng(), 14);
+            marker.openPopup();
+        } else {
+            alert("Location not available for this camp.");
+        }
+    }
+
+    function panMap(x, y){
+        map.panBy([x, y], {animate:true});
+    }
+</script>
+
+{% endblock %}

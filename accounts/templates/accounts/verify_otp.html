@@ -4,10 +4,9 @@
 {% block content %}
 <h2>Verify OTP</h2>
 
-<form method="post">
-  {% csrf_token %}
-  <label>Enter OTP:</label><br>
-  <input type="text" name="otp" maxlength="4" required><br><br>
-  <button type="submit" class="btn btn-success">Verify</button>
+<form method="POST" class="card p-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-red">Verify OTP</button>
 </form>
 {% endblock %}

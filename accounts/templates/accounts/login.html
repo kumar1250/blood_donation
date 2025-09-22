@@ -2,27 +2,23 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<h2>🔑 Login</h2>
+<h2>Login</h2>
 
-{% if messages %}
-  <ul>
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
-
-<form method="post" autocomplete="off">
-  {% csrf_token %}
-  <label>Username:</label><br>
-  <input type="text" name="username" value="{{ username|default:'' }}" required><br><br>
-
-  <label>Password:</label><br>
-  <input type="password" name="password" required><br><br>
-
-  <button type="submit" class="btn btn-primary">Login</button>
+<form method="POST" class="card p-3">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="id_username">Username:</label>
+        <input type="text" name="username" id="id_username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="id_password">Password:</label>
+        <input type="password" name="password" id="id_password" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-red">Login</button>
 </form>
 
-<p><a href="{% url 'forgot_password' %}">Forgot Password?</a></p>
-<p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
+<p class="mt-2">
+    Forgot password? <a href="{% url 'accounts:forgot_password' %}" class="text-red">Reset here</a><br>
+    Don't have an account? <a href="{% url 'accounts:signup' %}" class="text-red">Sign up</a>
+</p>
 {% endblock %}

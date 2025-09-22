@@ -25,7 +25,8 @@ class BloodRequest(models.Model):
     )
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=20, blank=True, null=True, unique=False)
+
     address = models.TextField()
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     emergency = models.BooleanField(default=False)

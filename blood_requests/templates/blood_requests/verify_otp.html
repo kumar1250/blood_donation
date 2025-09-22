@@ -2,28 +2,15 @@
 {% block title %}Verify OTP{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 500px;">
-    <h2>🔑 Verify OTP</h2>
+<h2>Verify OTP for {{ br.name }}'s Request</h2>
 
-    <p>
-        <strong>Requester:</strong> {{ br.name }} <br>
-        <strong>Blood Group:</strong> {{ br.blood_group }} <br>
-        <strong>Address:</strong> {{ br.address }} <br>
-        <strong>Phone:</strong> {{ br.phone }}
-    </p>
+<form method="POST" class="card p-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-red">Verify OTP</button>
+</form>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Verify</button>
-    </form>
-
-    <p class="mt-3"><a href="{% url 'request_list' %}" class="btn btn-secondary">⬅ Back to Requests</a></p>
-</div>
+<p><strong>Blood Group:</strong> {{ br.blood_group }}</p>
+<p><strong>Address:</strong> {{ br.address }}</p>
+<p><strong>Reason:</strong> {{ br.reason }}</p>
 {% endblock %}

@@ -2,72 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Blood Donation{% endblock %}</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        nav.navbar {
-            margin-bottom: 20px;
-        }
-        footer {
-            margin-top: 30px;
-            padding: 15px;
-            background: #343a40;
-            color: white;
-            text-align: center;
-        }
+        /* Body and container */
+        body { margin: 0; font-family: Arial, sans-serif; background-color: #000; color: #fff; }
+        .container { max-width: 1000px; margin: 20px auto; padding: 20px; background-color: #111; border-radius: 10px; }
+
+        /* Navbar */
+        nav { background-color: red; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        nav a { color: #fff; text-decoration: none; margin-right: 15px; font-weight: bold; }
+        nav a:hover { color: #000; }
+        nav .nav-left { display: flex; align-items: center; }
+        nav .nav-right { display: flex; align-items: center; }
+
+        /* Headings */
+        h1, h2, h3 { color: red; margin-bottom: 20px; }
+
+        /* Buttons */
+        .btn { background-color: red; color: #fff; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
+        .btn:hover { background-color: darkred; }
+
+        /* Forms */
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; background-color: #222; color: #fff; }
+        button { width: 100%; padding: 10px; border-radius: 5px; border: none; background-color: red; color: #fff; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: darkred; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #fff; padding: 10px; text-align: center; }
+        th { background-color: red; }
+        tr:nth-child(even) { background-color: #222; }
+
+        /* Alerts */
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
+        .alert-success { background-color: green; color: #fff; }
+        .alert-error { background-color: darkred; color: #fff; }
+        .alert-info { background-color: blue; color: #fff; }
+
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">❤️ Blood Donation</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}">Requests</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'create_request' %}">New Request</a></li>
-
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'followers_list' %}">Followers</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main content -->
-    <div class="container mt-3">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
+<!-- Navbar -->
+<nav>
+    <div class="nav-left">
+        <a href="{% url 'blood_requests:request_list' %}">🏥 Blood Requests</a>
+        <a href="{% url 'blood_requests:request_form' %}">+ New Request</a>
     </div>
+    <div class="nav-right">
+        {% if user.is_authenticated %}
+            <span>Hello, {{ user.username }}</span>
+            <a href="{% url 'accounts:logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">Login</a>
+            <a href="{% url 'accounts:signup' %}">Signup</a>
+        {% endif %}
+    </div>
+</nav>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2025 Blood Donation Project | All Rights Reserved</p>
-    </footer>
+<div class="container">
+    <!-- Django messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Page content -->
+    {% block content %}{% endblock %}
+</div>
+
 </body>
 </html>

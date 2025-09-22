@@ -2,34 +2,34 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h2>Welcome, {{ user.username }} 👋</h2>
-<p>Select an option below:</p>
+<div class="container mt-4">
+    <h1>Welcome, {{ request.user.username }}!</h1>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h4>📝 New Request</h4>
-            <p>Create a new blood request.</p>
-            <!-- ✅ Correct URL -->
-            <a class="btn btn-primary" href="{% url 'create_request' %}">Create Request</a>
-        </div>
-    </div>
+    <h2 class="mt-4">Upcoming Blood Camps</h2>
+    <ul class="list-group mb-4">
+        {% for camp in upcoming_camps %}
+        <li class="list-group-item">
+            <strong>{{ camp.name }}</strong> - {{ camp.date }} - {{ camp.time }}
+            <br>Venue: {{ camp.venue }}
+            <br>Organized by: {{ camp.organized_by }}
+        </li>
+        {% empty %}
+        <li class="list-group-item">No upcoming blood camps.</li>
+        {% endfor %}
+    </ul>
 
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h4>📋 Request List</h4>
-            <p>See all blood requests.</p>
-            <a class="btn btn-success" href="{% url 'request_list' %}">View Requests</a>
-        </div>
-    </div>
+    <h2>Latest Blood Requests</h2>
+    <ul class="list-group mb-4">
+        {% for req in latest_requests %}
+        <li class="list-group-item">
+            {{ req.patient_name }} - {{ req.blood_group }} - {{ req.city }}
+        </li>
+        {% empty %}
+        <li class="list-group-item">No blood requests.</li>
+        {% endfor %}
+    </ul>
 
-    <div class="col-md-4">
-        <div class="card p-3">
-            <h4>💬 Chat</h4>
-            <p>Chat with other users.</p>
-            <!-- Make sure 'chat_home' exists in chat/urls.py -->
-            <a class="btn btn-warning" href="{% url 'chat_home' %}">Go to Chat</a>
-        </div>
-    </div>
+    <a href="{% url 'blood_camp:create_camp' %}" class="btn btn-primary">Create Blood Camp</a>
+    <a href="{% url 'blood_requests:request_list' %}" class="btn btn-success">View All Requests</a>
 </div>
 {% endblock %}

@@ -1,20 +1,13 @@
-# blood_donation/urls.py
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('admin/', admin.site.urls),
 
-    # accounts app handles login/signup/profile
-    path("accounts/", include("accounts.urls")),
-
-    # chat app
-    path("chat/", include("chat.urls")),
-
-    # blood requests
-    path("requests/", include("blood_requests.urls")),
-
-    # home page (root)
-    path("", include("home.urls")),  # keep this last as the default root
+    # Apps with namespaces
+    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('chat/', include(('chat.urls', 'chat'), namespace='chat')),
+    path('requests/', include(('blood_requests.urls', 'blood_requests'), namespace='blood_requests')),
+    path('camps/', include(('blood_camp.urls', 'blood_camp'), namespace='blood_camp')),
+    path('', include(('home.urls', 'home'), namespace='home')),  # Home page
 ]
-

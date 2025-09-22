@@ -2,23 +2,27 @@
 {% block title %}Blood Requests{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>All Blood Requests</h2>
-    <a href="{% url 'create_request' %}" class="btn btn-success mb-3">+ New Request</a>
+<h2>Blood Requests</h2>
+<a href="{% url 'blood_requests:request_form' %}" class="btn btn-red mb-3">Create New Request</a>
 
-    <ul class="list-group">
-        {% for r in requests %}
-            <li class="list-group-item">
-                <strong>{{ r.name }}</strong> - {{ r.blood_group }}<br>
-                📍 Address: {{ r.address }}<br>
-                📞 Phone: {{ r.phone }}<br>
-                {% if r.reason %}📝 Reason: {{ r.reason }}<br>{% endif %}
-                <a href="{% url 'accept_request' r.id %}" class="btn btn-sm btn-primary mt-1">Accept</a>
-                <a href="{% url 'verify_otp' r.id %}" class="btn btn-sm btn-warning mt-1">Verify OTP</a>
-            </li>
-        {% empty %}
-            <li class="list-group-item">No requests available.</li>
+{% if requests %}
+    <div class="row">
+        {% for br in requests %}
+        <div class="col-md-4 mb-3">
+            <div class="card p-3">
+                <h5>{{ br.name }} ({{ br.blood_group }})</h5>
+                <p><strong>Address:</strong> {{ br.address }}</p>
+                <p><strong>Reason:</strong> {{ br.reason }}</p>
+                {% if br.accepted_by %}
+                    <p><strong>Accepted By:</strong> {{ br.accepted_by.username }}</p>
+                {% else %}
+                    <a href="{% url 'blood_requests:accept_request' br.id %}" class="btn btn-red">Accept Request</a>
+                {% endif %}
+            </div>
+        </div>
         {% endfor %}
-    </ul>
-</div>
+    </div>
+{% else %}
+    <p>No blood requests found.</p>
+{% endif %}
 {% endblock %}

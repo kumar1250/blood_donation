@@ -3,8 +3,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        user = self.scope["user"]
-        if user.is_authenticated:
+        user = self.scope.get("user")
+        if user and user.is_authenticated:
             self.group_name = f"user_{user.id}"
             await self.channel_layer.group_add(self.group_name, self.channel_name)
             await self.accept()
@@ -12,9 +12,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        user = self.scope["user"]
-        if user.is_authenticated:
+        user = self.scope.get("user")
+        if user and user.is_authenticated:
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def send_notification(self, event):
-        await self.send(text_data=json.dumps(event["message"]))
+        # event is expected to have a 'message' key
+        await self.send(text_data=json.dumps({"message": event.get("message")}))
