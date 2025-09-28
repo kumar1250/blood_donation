@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Live Donor Map{% endblock %}
+
+{% block content %}
+<h2>Accepted Donors Live Location</h2>
+
+<div id="map" style="height: 500px; width: 100%;"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<script>
+  var map = L.map('map').setView([20.5937, 78.9629], 5); // default India view
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Donor markers
+  var donorData = {{ donor_locations|safe }};
+  donorData.forEach(function(donor) {
+    var marker = L.marker([donor.lat, donor.lng], {title: donor.username})
+      .addTo(map)
+      .bindPopup(
+        "<b>" + donor.username + "</b><br>Blood Group: " + donor.blood_group +
+        "<br>Address: " + donor.address
+      );
+  });
+
+  // Requester (my) location marker
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var myMarker = L.marker([pos.coords.latitude, pos.coords.longitude], {title: "Me"})
+        .addTo(map)
+        .bindPopup("<b>My Location</b>");
+      myMarker.setIcon(L.icon({
+        iconUrl: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+        iconSize: [32, 32]
+      }));
+    });
+  }
+</script>
+{% endblock %}

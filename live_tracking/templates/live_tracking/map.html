@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Blood Request Map{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-danger mb-3">Live Map - Blood Request #{{ request_id }}</h2>
+    <div id="map" style="height: 500px;"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script>
+const map = L.map('map').setView([20.5937, 78.9629], 5); // India default
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+}).addTo(map);
+
+let markers = {};
+
+// Function to fetch donor + requester locations
+function updateDonors() {
+    fetch("{% url 'live_tracking:donors_for_request' request_id %}")
+        .then(response => response.json())
+        .then(data => {
+            // Clear old markers
+            Object.values(markers).forEach(m => map.removeLayer(m));
+            markers = {};
+
+            // Requester marker
+            if (data.requester && data.requester.lat && data.requester.lng) {
+                markers["requester"] = L.marker([data.requester.lat, data.requester.lng])
+                    .addTo(map)
+                    .bindPopup("Requester");
+            }
+
+            // Donor markers
+            data.donors.forEach(d => {
+                if (d.lat && d.lng) {
+                    markers[d.id] = L.marker([d.lat, d.lng])
+                        .addTo(map)
+                        .bindPopup(d.username);
+                }
+            });
+        });
+}
+
+// Initial load
+updateDonors();
+// Update every 5 seconds
+setInterval(updateDonors, 5000);
+</script>
+{% endblock %}

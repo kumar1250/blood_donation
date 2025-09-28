@@ -8,7 +8,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             self.group_name = f"user_{user.id}"
             await self.channel_layer.group_add(self.group_name, self.channel_name)
             await self.accept()
-        else:
+        else:send_notification
             await self.close()
 
     async def disconnect(self, close_code):
@@ -16,6 +16,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         if user and user.is_authenticated:
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-    async def send_notification(self, event):
+    async def (self, event):
         # event is expected to have a 'message' key
         await self.send(text_data=json.dumps({"message": event.get("message")}))

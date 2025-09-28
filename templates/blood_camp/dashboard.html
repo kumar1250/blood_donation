@@ -3,36 +3,37 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Blood Camps Dashboard</h2>
+    <h2 class="mb-4 text-danger">Blood Camps Dashboard</h2>
 
     <!-- Quick Actions -->
-    <div class="mb-4">
-        <a href="{% url 'blood_camp:create_camp' %}" class="btn btn-danger me-2">Create New Blood Camp</a>
-        <a href="{% url 'blood_camp:camp_list' %}" class="btn btn-primary me-2">View All Camps</a>
-        <a href="{% url 'blood_requests:request_form' %}" class="btn btn-success me-2">Create Blood Request</a>
+    <div class="mb-4 d-flex flex-wrap gap-2">
+        <a href="{% url 'home' %}" class="btn btn-dark">🏠 Home</a>
+        <a href="{% url 'blood_camp:create_camp' %}" class="btn btn-danger">Create New Blood Camp</a>
+        <a href="{% url 'blood_camp:camp_list' %}" class="btn btn-primary">View All Camps</a>
+        <a href="{% url 'blood_requests:request_form' %}" class="btn btn-success">Create Blood Request</a>
         <a href="{% url 'blood_requests:request_list' %}" class="btn btn-info">View All Requests</a>
     </div>
 
     <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-danger mb-3">
+    <div class="row mb-4 g-3">
+        <div class="col-md-4 col-sm-6">
+            <div class="card text-white bg-danger h-100">
                 <div class="card-body">
                     <h5 class="card-title">Total Blood Camps</h5>
                     <p class="card-text fs-3">{{ total_camps }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
+        <div class="col-md-4 col-sm-6">
+            <div class="card text-white bg-primary h-100">
                 <div class="card-body">
                     <h5 class="card-title">Upcoming Camps</h5>
                     <p class="card-text fs-3">{{ upcoming_camps }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
+        <div class="col-md-4 col-sm-6">
+            <div class="card text-white bg-success h-100">
                 <div class="card-body">
                     <h5 class="card-title">Total Blood Requests</h5>
                     <p class="card-text fs-3">{{ total_requests }}</p>
@@ -42,17 +43,20 @@
     </div>
 
     <!-- Recent Camps -->
-    <h4>Recent Blood Camps</h4>
+    <h4 class="mt-4 mb-3 text-danger">Recent Blood Camps</h4>
     {% if recent_camps %}
         <ul class="list-group mb-4">
             {% for camp in recent_camps %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                     <div>
-                        <strong>{{ camp.name }}</strong> <br>
-                        📍 {{ camp.venue }}, {{ camp.city }} <br>
+                        <strong>{{ camp.name }}</strong><br>
+                        📍 {{ camp.venue }}, {{ camp.city }}<br>
                         📅 {{ camp.date }} at {{ camp.time }}
                     </div>
-                    <a href="{% url 'blood_camp:camp_detail' camp.id %}" class="btn btn-sm btn-primary">View</a>
+                    <div class="mt-2 mt-md-0">
+                        <a href="{% url 'blood_camp:camp_detail' camp.id %}" class="btn btn-sm btn-primary me-2">View</a>
+                        <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -61,16 +65,18 @@
     {% endif %}
 
     <!-- Recent Blood Requests -->
-    <h4>Recent Blood Requests</h4>
+    <h4 class="mt-4 mb-3 text-danger">Recent Blood Requests</h4>
     {% if recent_requests %}
         <ul class="list-group">
             {% for req in recent_requests %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                     <div>
-                        <strong>{{ req.patient_name }}</strong> - {{ req.blood_group }} <br>
+                        <strong>{{ req.patient_name }}</strong> - {{ req.blood_group }}<br>
                         📍 {{ req.city }} | Requested at: {{ req.created_at|date:"M d, Y H:i" }}
                     </div>
-                    <a href="{% url 'blood_requests:request_list' %}" class="btn btn-sm btn-info">View</a>
+                    <div class="mt-2 mt-md-0">
+                        <a href="{% url 'blood_requests:request_list' %}" class="btn btn-sm btn-info">View</a>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -78,4 +84,12 @@
         <p>No recent requests.</p>
     {% endif %}
 </div>
+
+<style>
+    @media (max-width: 576px) {
+        .card-text { font-size: 1.2rem; }
+        .btn { font-size: 0.85rem; }
+        h2, h4 { font-size: 1.3rem; }
+    }
+</style>
 {% endblock %}

@@ -3,33 +3,56 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Welcome, {{ request.user.username }}!</h1>
+    <!-- Welcome -->
+    <h1 class="mb-4 text-danger">Welcome, {{ request.user.username }}!</h1>
 
-    <h2 class="mt-4">Upcoming Blood Camps</h2>
-    <ul class="list-group mb-4">
-        {% for camp in upcoming_camps %}
-        <li class="list-group-item">
-            <strong>{{ camp.name }}</strong> - {{ camp.date }} - {{ camp.time }}
-            <br>Venue: {{ camp.venue }}
-            <br>Organized by: {{ camp.organized_by }}
-        </li>
-        {% empty %}
-        <li class="list-group-item">No upcoming blood camps.</li>
-        {% endfor %}
-    </ul>
+    <!-- Upcoming Blood Camps -->
+    <h3 class="mb-3 text-danger">Upcoming Blood Camps</h3>
+    {% if upcoming_camps %}
+        <div class="row g-3 mb-4">
+            {% for camp in upcoming_camps %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ camp.name }}</h5>
+                            <p class="card-text mb-1"><strong>Date:</strong> {{ camp.date }}</p>
+                            <p class="card-text mb-1"><strong>Time:</strong> {{ camp.time }}</p>
+                            <p class="card-text mb-1"><strong>Venue:</strong> {{ camp.venue }}</p>
+                            <p class="card-text mb-1"><strong>Organized by:</strong> {{ camp.organized_by }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No upcoming blood camps.</p>
+    {% endif %}
 
-    <h2>Latest Blood Requests</h2>
-    <ul class="list-group mb-4">
-        {% for req in latest_requests %}
-        <li class="list-group-item">
-            {{ req.patient_name }} - {{ req.blood_group }} - {{ req.city }}
-        </li>
-        {% empty %}
-        <li class="list-group-item">No blood requests.</li>
-        {% endfor %}
-    </ul>
+    <!-- Latest Blood Requests -->
+    <h3 class="mb-3 text-danger">Latest Blood Requests</h3>
+    {% if latest_requests %}
+        <div class="row g-3 mb-4">
+            {% for req in latest_requests %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ req.patient_name }}</h5>
+                            <p class="card-text mb-1"><strong>Blood Group:</strong> {{ req.blood_group }}</p>
+                            <p class="card-text mb-1"><strong>City:</strong> {{ req.city }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No blood requests.</p>
+    {% endif %}
 
-    <a href="{% url 'blood_camp:create_camp' %}" class="btn btn-primary">Create Blood Camp</a>
-    <a href="{% url 'blood_requests:request_list' %}" class="btn btn-success">View All Requests</a>
+    <!-- Quick Action Buttons -->
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        <a href="{% url 'blood_camp:create_camp' %}" class="btn btn-danger">Create Blood Camp</a>
+        <a href="{% url 'blood_requests:request_list' %}" class="btn btn-success">View All Requests</a>
+        <a href="{% url 'live_tracking:donor_map' %}" class="btn btn-info">View Donors Live Map</a>
+    </div>
 </div>
 {% endblock %}

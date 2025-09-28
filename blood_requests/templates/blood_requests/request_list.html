@@ -3,25 +3,50 @@
 
 {% block content %}
 <h2>Blood Requests</h2>
-<a href="{% url 'blood_requests:request_form' %}" class="btn btn-red mb-3">Create New Request</a>
+
+<a href="{% url 'blood_requests:request_form' %}" class="btn">➕ New Request</a>
 
 {% if requests %}
-    <div class="row">
-        {% for br in requests %}
-        <div class="col-md-4 mb-3">
-            <div class="card p-3">
-                <h5>{{ br.name }} ({{ br.blood_group }})</h5>
-                <p><strong>Address:</strong> {{ br.address }}</p>
-                <p><strong>Reason:</strong> {{ br.reason }}</p>
-                {% if br.accepted_by %}
-                    <p><strong>Accepted By:</strong> {{ br.accepted_by.username }}</p>
+    {% for br in requests %}
+        <div class="container" style="margin-top:15px; padding:15px; border:1px solid #333;">
+            <h3>{{ br.name }} ({{ br.blood_group }}) 
+                {% if br.emergency %}
+                    <span style="color:yellow;">⚠ Emergency</span>
+                {% endif %}
+            </h3>
+            <p><strong>Address:</strong> {{ br.address }}</p>
+            <p><strong>Reason:</strong> {{ br.reason|default:"N/A" }}</p>
+            <p><strong>Requested By:</strong> {{ br.requester.username }}</p>
+
+            <div>
+                {% if request.user == br.requester %}
+                    <form action="{% url 'blood_requests:delete_request' br.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn">🗑 Delete</button>
+                    </form>
                 {% else %}
-                    <a href="{% url 'blood_requests:accept_request' br.id %}" class="btn btn-red">Accept Request</a>
+                    {% if request.user not in br.accepted_donors.all %}
+                        <a href="{% url 'blood_requests:accept_request' br.id %}" class="btn">✅ Accept</a>
+                    {% else %}
+                        <span class="alert-info">Already Accepted</span>
+
+                        {% if not br.otp_verified %}
+                            <a href="{% url 'blood_requests:verify_otp' br.id %}" class="btn">🔑 Verify OTP</a>
+                        {% endif %}
+
+                        {% with loc=request.user.live_location %}
+                            {% if loc and loc.is_sharing %}
+                                <a href="{% url 'live_tracking:map_view' br.id %}" class="btn">📍 View Map</a>
+                                <a href="{% url 'blood_requests:toggle_location_share' br.id %}" class="btn">⏹ Stop Sharing</a>
+                            {% else %}
+                                <a href="{% url 'blood_requests:toggle_location_share' br.id %}" class="btn">📡 Share Location</a>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
-        {% endfor %}
-    </div>
+    {% endfor %}
 {% else %}
     <p>No blood requests found.</p>
 {% endif %}

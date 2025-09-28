@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Create Blood Camp{% endblock %}
+
+{% block content %}
+<h2>Create Blood Camp</h2>
+<form method="POST" class="card p-3">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Camp Name" required>
+    <input type="text" name="organized_by" placeholder="Organized By" required>
+    <input type="date" name="date" required>
+    <input type="text" name="time" placeholder="Time (e.g., 10:00 AM - 4:00 PM)" required>
+    <textarea name="venue" placeholder="Venue / Address" required></textarea>
+    <input type="text" name="contact_person" placeholder="Contact Person" required>
+    <input type="text" name="contact_phone" placeholder="Contact Phone" required>
+    <input type="number" name="min_age" placeholder="Min Age" value="18">
+    <input type="number" name="max_age" placeholder="Max Age" value="60">
+    <input type="number" name="min_weight" placeholder="Min Weight (kg)" value="50">
+    <textarea name="notes" placeholder="Notes (optional)"></textarea>
+    <button type="submit" class="btn btn-red">Create Camp</button>
+</form>
+{% endblock %}

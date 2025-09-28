@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}All Blood Camps{% endblock %}
+
+{% block content %}
+<h2>All Blood Camps</h2>
+<a href="{% url 'blood_camp:create_camp' %}" class="btn btn-red mb-3">+ Create New Camp</a>
+
+{% if camps %}
+    <div class="row">
+        {% for camp in camps %}
+        <div class="col-md-6 mb-3">
+            <div class="card p-3">
+                <h5>{{ camp.name }}</h5>
+                <p><strong>Organized By:</strong> {{ camp.organized_by }}</p>
+                <p><strong>Date & Time:</strong> {{ camp.date }} | {{ camp.time }}</p>
+                <p><strong>Venue:</strong> {{ camp.venue }}</p>
+                <p><strong>Contact:</strong> {{ camp.contact_person }} | {{ camp.contact_phone }}</p>
+                <p><strong>Eligibility:</strong> Age {{ camp.min_age }}-{{ camp.max_age }}, Weight ≥ {{ camp.min_weight }}kg</p>
+                {% if camp.notes %}
+                    <p><strong>Notes:</strong> {{ camp.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No upcoming blood camps.</p>
+{% endif %}
+{% endblock %}

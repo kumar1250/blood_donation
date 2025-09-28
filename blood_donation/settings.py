@@ -18,6 +18,8 @@ INSTALLED_APPS = [
     'chat',
     'channels',
     'blood_camp',
+    'live_tracking',
+    'widget_tweaks',
 ]
 # existing...
 LOGIN_REDIRECT_URL = "/"            # keep as root

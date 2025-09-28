@@ -2,14 +2,27 @@
 {% block title %}Delete {{ camp.name }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Delete Blood Camp</h2>
-    <p>Are you sure you want to delete the camp: <strong>{{ camp.name }}</strong>?</p>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="mb-3 text-danger">Delete Blood Camp</h2>
+            <p>Are you sure you want to delete the camp: <strong>{{ camp.name }}</strong>?</p>
 
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        <a href="{% url 'blood_camp:dashboard' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+            <form method="POST" class="mt-3 d-flex gap-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                <a href="{% url 'blood_camp:dashboard' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
 </div>
+
+<style>
+    .card { border-radius: 10px; }
+    @media (max-width: 576px) {
+        h2 { font-size: 1.5rem; }
+        p { font-size: 0.9rem; }
+        .btn { font-size: 0.9rem; }
+    }
+</style>
 {% endblock %}

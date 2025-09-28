@@ -1,12 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Create Blood Request{% endblock %}
-
+{% block title %}New Blood Request{% endblock %}
 {% block content %}
-<h2>Create Blood Request</h2>
-
-<form method="POST" class="card p-3">
+<h2>Create New Blood Request</h2>
+<form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-red">Submit Request</button>
+    <button type="submit">Submit</button>
 </form>
 {% endblock %}
