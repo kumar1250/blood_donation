@@ -27,7 +27,6 @@
         fetch("{% url 'live_tracking:donors_for_request' br.id %}")
             .then(res => res.json())
             .then(data => {
-                // Update requester marker
                 if (data.requester) {
                     if (!requesterMarker) {
                         requesterMarker = L.marker([data.requester.lat, data.requester.lng], {icon: L.icon({iconUrl: "https://cdn-icons-png.flaticon.com/512/1077/1077012.png", iconSize: [32, 32]})})
@@ -40,7 +39,6 @@
                     }
                 }
 
-                // Update donor markers
                 data.donors.forEach(donor => {
                     if (!donorMarkers[donor.id]) {
                         donorMarkers[donor.id] = L.marker([donor.lat, donor.lng], {icon: L.icon({iconUrl: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png", iconSize: [32, 32]})})
@@ -54,7 +52,6 @@
             .catch(err => console.error("Location fetch error:", err));
     }
 
-    // Auto-refresh every 5s
     setInterval(fetchLocations, 5000);
     fetchLocations();
 </script>
@@ -73,14 +70,6 @@
             {% if not br.otp_verified %}
                 <a href="{% url 'blood_requests:verify_otp' br.id %}" class="btn">🔑 Verify OTP</a>
             {% endif %}
-
-            {% with loc=request.user.live_location %}
-                {% if loc and loc.is_sharing %}
-                    <a href="{% url 'blood_requests:toggle_location_share' br.id %}" class="btn">⏹ Stop Sharing</a>
-                {% else %}
-                    <a href="{% url 'blood_requests:toggle_location_share' br.id %}" class="btn">📡 Share Location</a>
-                {% endif %}
-            {% endwith %}
         {% endif %}
     {% endif %}
 </div>

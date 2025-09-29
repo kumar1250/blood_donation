@@ -18,7 +18,7 @@
                             <p class="card-text mb-1"><strong>Date:</strong> {{ camp.date }}</p>
                             <p class="card-text mb-1"><strong>Time:</strong> {{ camp.time }}</p>
                             <p class="card-text mb-1"><strong>Venue:</strong> {{ camp.venue }}</p>
-                            <p class="card-text mb-1"><strong>Organized by:</strong> {{ camp.organized_by }}</p>
+                            <p class="card-text mb-1"><strong>Organized by:</strong> {{ camp.organizer.username }}</p>
                         </div>
                     </div>
                 </div>
@@ -30,9 +30,9 @@
 
     <!-- Latest Blood Requests -->
     <h3 class="mb-3 text-danger">Latest Blood Requests</h3>
-    {% if latest_requests %}
+    {% if recent_requests %}
         <div class="row g-3 mb-4">
-            {% for req in latest_requests %}
+            {% for req in recent_requests %}
                 <div class="col-md-6 col-lg-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">

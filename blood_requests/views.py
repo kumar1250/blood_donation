@@ -1,4 +1,4 @@
-import random, json
+import random
 from datetime import timedelta
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
@@ -6,20 +6,16 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib.auth import get_user_model
-from django.views.decorators.csrf import csrf_exempt
 
-from .models import BloodRequest
+from .models import BloodRequest, Notification
 from .forms import BloodRequestForm, OTPForm
 from chat.models import ChatMessage
-from live_tracking.models import LiveLocation
 
 User = get_user_model()
 
-
 # -------------------------------
-# Generate 6-digit OTP
+# Utility: Generate 6-digit OTP
 # -------------------------------
 def _generate_otp():
     return f"{random.randint(100000, 999999):06d}"
@@ -30,11 +26,6 @@ def _generate_otp():
 # -------------------------------
 @login_required
 def request_list(request):
-    BloodRequest.objects.filter(
-        otp_created_at__isnull=False,
-        otp_verified=False,
-        otp_created_at__lt=timezone.now() - timedelta(days=2)
-    ).delete()
     requests = BloodRequest.objects.all().order_by("-created_at")
     return render(request, "blood_requests/request_list.html", {"requests": requests})
 
@@ -53,23 +44,10 @@ def request_form(request):
             messages.success(request, "✅ Blood request created successfully!")
             return redirect("blood_requests:request_list")
         else:
-            messages.error(request, "❌ Please correct the errors.")
+            messages.error(request, "❌ Please correct the errors below.")
     else:
         form = BloodRequestForm()
     return render(request, "blood_requests/request_form.html", {"form": form})
-
-
-# -------------------------------
-# Delete a blood request
-# -------------------------------
-@login_required
-def delete_request(request, request_id):
-    br = get_object_or_404(BloodRequest, id=request_id)
-    if request.user != br.requester:
-        return HttpResponseForbidden("❌ Not allowed")
-    br.delete()
-    messages.success(request, "✅ Blood request deleted.")
-    return redirect("blood_requests:request_list")
 
 
 # -------------------------------
@@ -85,49 +63,45 @@ def accept_request(request, request_id):
 
     br.accepted_donors.add(request.user)
 
+    # Generate OTP
     otp = _generate_otp()
     br.otp = otp
     br.otp_created_at = timezone.now()
     br.otp_verified = False
     br.save()
 
-    # Ensure donor has a LiveLocation object
-    LiveLocation.objects.get_or_create(user=request.user, defaults={"is_sharing": False})
-
     donor_phone = getattr(request.user, "phone", "N/A")
     donor_address = getattr(request.user, "address", "N/A")
 
+    # Email to requester
+    subject = "Blood Request Donor Accepted - OTP"
+    body = (
+        f"Hello {br.name},\n\n"
+        f"{request.user.username} has accepted your blood request.\n\n"
+        f"🔑 OTP: {otp}\n"
+        f"📞 Donor Phone: {donor_phone}\n"
+        f"🏠 Donor Address: {donor_address}\n\n"
+        "Regards,\nBlood Donation Team"
+    )
     try:
-        subject = "Blood Request - Donor Accepted"
-        body = f"{request.user.username} accepted your request.\nOTP: {otp}\nPhone: {donor_phone}\nAddress: {donor_address}"
         send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [br.email])
-    except:
-        pass
+        messages.info(request, "📧 Donor details + OTP sent to requester by email.")
+    except Exception as e:
+        messages.error(request, f"Email failed: {e}")
 
+    # Chat message
     try:
         ChatMessage.objects.create(
             sender=request.user,
             recipient=br.requester,
-            content=f"🔑 OTP: {otp}\n📞 Phone: {donor_phone}\n🏠 Address: {donor_address}"
+            content=f"🔑 OTP: {otp}\n📞 {donor_phone}\n🏠 {donor_address}"
         )
-    except:
-        pass
+        messages.success(request, "✅ Donor details also sent via chat.")
+    except Exception as e:
+        messages.error(request, f"Chat message error: {e}")
 
-    messages.success(request, "✅ You accepted this request. Click 'Share Live Location' to start.")
-    return redirect("blood_requests:request_list")
-
-
-# -------------------------------
-# Toggle Live Location Sharing
-# -------------------------------
-@login_required
-def toggle_location_share(request, request_id):
-    loc, _ = LiveLocation.objects.get_or_create(user=request.user)
-    loc.is_sharing = not loc.is_sharing
-    loc.save()
-    status = "started" if loc.is_sharing else "stopped"
-    messages.success(request, f"✅ Live location sharing {status}.")
-    return redirect("blood_requests:request_list")
+    messages.success(request, "You accepted this request successfully.")
+    return redirect("blood_requests:verify_otp", request_id=br.id)
 
 
 # -------------------------------
@@ -139,20 +113,44 @@ def verify_otp(request, request_id):
 
     if br.otp_created_at and timezone.now() - br.otp_created_at > timedelta(days=2):
         br.delete()
-        messages.error(request, "❌ OTP expired. Request removed.")
+        messages.error(request, "❌ OTP expired. The request has been removed.")
         return redirect("blood_requests:request_list")
 
     if request.method == "POST":
         form = OTPForm(request.POST)
         if form.is_valid():
             entered = form.cleaned_data["otp"].strip()
-            if br.otp == entered:
+            if br.otp and br.otp == entered and br.otp_created_at and timezone.now() - br.otp_created_at <= timedelta(days=2):
                 br.otp_verified = True
                 br.save()
+
+                # Notify requester
+                subject = "Blood Request - Donor Confirmed"
+                message = (
+                    f"Hello {br.name},\n\n"
+                    f"Your request has been confirmed by donors.\n"
+                    f"Check your dashboard or chat for details.\n\n"
+                    "Regards,\nBlood Donation Team"
+                )
+                try:
+                    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [br.email])
+                except Exception as e:
+                    print("Email error:", e)
+
+                # Optional: notify others with same blood group
+                if br.blood_group:
+                    same_users = User.objects.filter(blood_group=br.blood_group).exclude(id=br.requester_id)
+                    notif_msg = (
+                        f"Urgent: {br.blood_group} blood needed at {br.address} "
+                        f"({br.reason or 'no reason'})"
+                    )
+                    for u in same_users:
+                        Notification.objects.create(user=u, message=notif_msg)
+
                 messages.success(request, "✅ OTP verified. Donor confirmed.")
                 return redirect("blood_requests:request_list")
             else:
-                messages.error(request, "❌ Invalid OTP.")
+                messages.error(request, "❌ Invalid OTP or expired.")
     else:
         form = OTPForm()
 
@@ -160,33 +158,25 @@ def verify_otp(request, request_id):
 
 
 # -------------------------------
-# Update Requester Location (AJAX)
+# Delete request
 # -------------------------------
-@csrf_exempt
 @login_required
-def update_requester_location(request, request_id):
-    if request.method != "POST":
-        return JsonResponse({"error": "POST required"}, status=400)
-
+def delete_request(request, request_id):
     br = get_object_or_404(BloodRequest, id=request_id)
+
     if br.requester != request.user:
-        return HttpResponseForbidden("❌ Only requester can update their location")
+        messages.error(request, "❌ You cannot delete this request.")
+        return redirect("blood_requests:request_list")
 
-    try:
-        data = json.loads(request.body)
-        lat = float(data.get("latitude"))
-        lng = float(data.get("longitude"))
-    except:
-        return JsonResponse({"error": "Invalid data"}, status=400)
-
-    br.requester_lat = lat
-    br.requester_lng = lng
-    br.save(update_fields=["requester_lat", "requester_lng"])
-
-    return JsonResponse({"status": "ok"})
+    br.delete()
+    messages.success(request, "✅ Blood request deleted successfully.")
+    return redirect("blood_requests:request_list")
 
 
+# -------------------------------
+# Placeholder for toggle location
+# -------------------------------
 @login_required
-def home(request):
-    # Redirect to request list (or render a homepage template)
+def toggle_location_share(request, request_id):
+    messages.info(request, "⚠️ Live location feature is disabled.")
     return redirect("blood_requests:request_list")

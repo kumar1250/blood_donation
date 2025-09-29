@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Verify OTP{% endblock %}
+
 {% block content %}
 <h2>Verify OTP for {{ br.name }}'s Request</h2>
-<p>⚠ OTP will expire in 2 days.</p>
-<form method="post">
+<p style="color: yellow;">⚠ OTP will expire in 2 days.</p>
+
+<form method="post" style="margin-top: 15px;">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Verify OTP</button>
+    <button type="submit" class="btn" style="margin-top: 10px;">🔑 Verify OTP</button>
 </form>
 {% endblock %}

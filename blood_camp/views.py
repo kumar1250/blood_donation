@@ -6,6 +6,9 @@ from .models import BloodCamp
 from blood_requests.models import BloodRequest
 from .forms import BloodCampForm  # ✅ use the form
 
+
+
+
 @login_required
 def create_camp(request):
     if request.method == "POST":
@@ -23,15 +26,35 @@ def create_camp(request):
 
     return render(request, "blood_camp/create_camp.html", {"form": form})
 
+
 @login_required
 def camp_list(request):
+    """
+    List all upcoming blood camps and today's camps.
+    Automatically deletes past camps.
+    """
+    # Delete all past camps
     BloodCamp.objects.filter(date__lt=timezone.now().date()).delete()
-    camps = BloodCamp.objects.all().order_by("date")
+    
+    # Fetch upcoming and today's camps, ordered by date
+    camps = BloodCamp.objects.filter(date__gte=timezone.now().date()).order_by("date")
+    
     return render(request, "blood_camp/camp_list.html", {"camps": camps})
-
 @login_required
 def dashboard(request):
     BloodCamp.objects.filter(date__lt=timezone.now().date()).delete()
     camps = BloodCamp.objects.all().order_by("date")
     requests = BloodRequest.objects.all().order_by("-created_at")
     return render(request, "blood_camp/dashboard.html", {"camps": camps, "requests": requests})
+
+
+@login_required
+def delete_camp(request, camp_id):
+    camp = get_object_or_404(BloodCamp, id=camp_id)
+    if request.user != camp.organizer:
+        return HttpResponseForbidden("❌ You cannot delete this camp.")
+    if request.method == "POST":
+        camp.delete()
+        messages.success(request, "✅ Camp deleted successfully.")
+        return redirect("blood_camp:camp_list")
+    return render(request, "blood_camp/confirm_delete.html", {"camp": camp})

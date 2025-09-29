@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4 text-danger">Blood Camps Dashboard</h2>
+    <h2 class="mb-4 text-danger">🩸 Blood Camps Dashboard</h2>
 
     <!-- Quick Actions -->
     <div class="mb-4 d-flex flex-wrap gap-2">
@@ -18,7 +18,7 @@
     <div class="row mb-4 g-3">
         <div class="col-md-4 col-sm-6">
             <div class="card text-white bg-danger h-100">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <h5 class="card-title">Total Blood Camps</h5>
                     <p class="card-text fs-3">{{ total_camps }}</p>
                 </div>
@@ -26,7 +26,7 @@
         </div>
         <div class="col-md-4 col-sm-6">
             <div class="card text-white bg-primary h-100">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <h5 class="card-title">Upcoming Camps</h5>
                     <p class="card-text fs-3">{{ upcoming_camps }}</p>
                 </div>
@@ -34,7 +34,7 @@
         </div>
         <div class="col-md-4 col-sm-6">
             <div class="card text-white bg-success h-100">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <h5 class="card-title">Total Blood Requests</h5>
                     <p class="card-text fs-3">{{ total_requests }}</p>
                 </div>
@@ -55,7 +55,10 @@
                     </div>
                     <div class="mt-2 mt-md-0">
                         <a href="{% url 'blood_camp:camp_detail' camp.id %}" class="btn btn-sm btn-primary me-2">View</a>
-                        <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        {% if request.user == camp.organizer %}
+                            <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn btn-sm btn-secondary me-2">Edit</a>
+                            <a href="{% url 'blood_camp:delete_camp' camp.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}

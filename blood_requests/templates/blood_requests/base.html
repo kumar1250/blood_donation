@@ -10,28 +10,106 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; background-color: #000; color: #fff; }
-        .container { max-width: 1000px; margin: 20px auto; padding: 20px; background-color: #111; border-radius: 10px; }
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif; 
+            background-color: #000; 
+            color: #fff; 
+        }
 
-        nav { background-color: red; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
-        nav a { color: #fff; text-decoration: none; margin-right: 15px; font-weight: bold; }
-        nav a:hover { color: #000; }
-        nav .nav-left, nav .nav-right { display: flex; align-items: center; }
+        .container { 
+            max-width: 1000px; 
+            margin: 20px auto; 
+            padding: 20px; 
+            background-color: #111; 
+            border-radius: 10px; 
+        }
 
-        h1, h2, h3 { color: red; margin-bottom: 20px; }
-        .btn { background-color: red; color: #fff; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; }
-        .btn:hover { background-color: darkred; }
+        nav { 
+            background-color: red; 
+            padding: 10px 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        nav a { 
+            color: #fff; 
+            text-decoration: none; 
+            margin-right: 15px; 
+            font-weight: bold; 
+        }
+        nav a:hover { 
+            color: #000; 
+        }
+        nav .nav-left, nav .nav-right { 
+            display: flex; 
+            align-items: center; 
+        }
 
-        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #444; background-color: #222; color: #fff; }
-        button { width: 100%; padding: 10px; border-radius: 5px; border: none; background-color: red; color: #fff; font-size: 16px; cursor: pointer; }
-        button:hover { background-color: darkred; }
+        h1, h2, h3 { 
+            color: red; 
+            margin-bottom: 20px; 
+        }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #fff; padding: 10px; text-align: center; }
-        th { background-color: red; }
-        tr:nth-child(even) { background-color: #222; }
+        .btn { 
+            background-color: red; 
+            color: #fff; 
+            padding: 8px 15px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            text-decoration: none; 
+        }
+        .btn:hover { 
+            background-color: darkred; 
+        }
 
-        .alert { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            border-radius: 5px; 
+            border: 1px solid #444; 
+            background-color: #222; 
+            color: #fff; 
+        }
+
+        button { 
+            width: 100%; 
+            padding: 10px; 
+            border-radius: 5px; 
+            border: none; 
+            background-color: red; 
+            color: #fff; 
+            font-size: 16px; 
+            cursor: pointer; 
+        }
+        button:hover { 
+            background-color: darkred; 
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th, td { 
+            border: 1px solid #fff; 
+            padding: 10px; 
+            text-align: center; 
+        }
+        th { 
+            background-color: red; 
+        }
+        tr:nth-child(even) { 
+            background-color: #222; 
+        }
+
+        .alert { 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            border-radius: 5px; 
+        }
         .alert-success { background-color: green; color: #fff; }
         .alert-error { background-color: darkred; color: #fff; }
         .alert-info { background-color: blue; color: #fff; }
@@ -61,9 +139,12 @@
 <div class="container">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
         {% endfor %}
     {% endif %}
+
     {% block content %}{% endblock %}
 </div>
 

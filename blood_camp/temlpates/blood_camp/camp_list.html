@@ -3,14 +3,17 @@
 
 {% block content %}
 <h2>All Blood Camps</h2>
-<a href="{% url 'blood_camp:create_camp' %}" class="btn btn-red mb-3">+ Create New Camp</a>
+
+<a href="{% url 'blood_camp:create_camp' %}" class="btn" style="background-color:red; color:#fff; margin-bottom:15px;">
+    + Create New Camp
+</a>
 
 {% if camps %}
     <div class="row">
         {% for camp in camps %}
         <div class="col-md-6 mb-3">
-            <div class="card p-3">
-                <h5>{{ camp.name }}</h5>
+            <div class="card" style="background-color:#111; color:#fff; padding:15px; border-radius:10px; border:1px solid #333;">
+                <h5 style="color:red;">{{ camp.name }}</h5>
                 <p><strong>Organized By:</strong> {{ camp.organized_by }}</p>
                 <p><strong>Date & Time:</strong> {{ camp.date }} | {{ camp.time }}</p>
                 <p><strong>Venue:</strong> {{ camp.venue }}</p>
@@ -19,11 +22,27 @@
                 {% if camp.notes %}
                     <p><strong>Notes:</strong> {{ camp.notes }}</p>
                 {% endif %}
+
+                <!-- Edit/Delete Buttons for Camp Owner -->
+                {% if request.user == camp.organizer %}
+                <div style="margin-top:10px;">
+                    <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn" style="background-color:orange; color:#fff; margin-right:5px;">
+                        ✏ Edit
+                    </a>
+
+                    <form action="{% url 'blood_camp:delete_camp' camp.id %}" method="POST" style="display:inline;" 
+                          onsubmit="return confirm('Are you sure you want to delete this camp?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn" style="background-color:red; color:#fff;">🗑 Delete</button>
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
     </div>
 {% else %}
-    <p>No upcoming blood camps.</p>
+    <p>No upcoming blood camps available.</p>
 {% endif %}
+
 {% endblock %}

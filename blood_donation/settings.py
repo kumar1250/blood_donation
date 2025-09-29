@@ -18,7 +18,7 @@ INSTALLED_APPS = [
     'chat',
     'channels',
     'blood_camp',
-    'live_tracking',
+    
     'widget_tweaks',
 ]
 # existing...
