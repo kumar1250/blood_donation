@@ -3,11 +3,11 @@
 
 {% block content %}
 <h2>Verify OTP for {{ br.name }}'s Request</h2>
-<p style="color: yellow;">⚠ OTP will expire in 2 days.</p>
+<p class="text-warning">⚠ OTP will expire in 2 days.</p>
 
-<form method="post" style="margin-top: 15px;">
+<form method="post" class="mt-3">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn" style="margin-top: 10px;">🔑 Verify OTP</button>
+    <button type="submit" class="btn btn-red">🔑 Verify OTP</button>
 </form>
 {% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Share Live Location{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 text-danger">Share Live Location for {{ br.name }}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="id_lat" class="form-label">Latitude</label>
+        {{ form.lat }}
+    </div>
+    <div class="mb-3">
+        <label for="id_lng" class="form-label">Longitude</label>
+        {{ form.lng }}
+    </div>
+    <button type="submit" class="btn btn-red">Share Location</button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const latInput = document.querySelector("input[name='lat']");
+            const lngInput = document.querySelector("input[name='lng']");
+            if (latInput && lngInput) {
+                latInput.value = position.coords.latitude;
+                lngInput.value = position.coords.longitude;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+ 

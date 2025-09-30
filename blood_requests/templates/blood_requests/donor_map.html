@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Live Donors Map{% endblock %}
+
+{% block content %}
+<h2 class="text-danger mb-3">Live Donors Map</h2>
+<div id="map"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let map = L.map('map').setView([20.5937, 78.9629], 5);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+let requesterMarker = null;
+let donorMarkers = {};
+
+async function fetchLocations() {
+    const res = await fetch("{% url 'blood_requests:donor_map' br.id %}?json=1");
+    const data = await res.json();
+
+    if (data.requester) {
+        const latlng = [data.requester.lat, data.requester.lng];
+        if (!requesterMarker) {
+            requesterMarker = L.circleMarker(latlng, { color: data.requester.color, radius: 10 }).addTo(map)
+                .bindPopup(data.requester.username);
+            map.setView(latlng, 14);
+        } else {
+            requesterMarker.setLatLng(latlng);
+        }
+    }
+
+    data.donors.forEach(d => {
+        const latlng = [d.lat, d.lng];
+        if (!donorMarkers[d.id]) {
+            donorMarkers[d.id] = L.circleMarker(latlng, { color: d.color, radius: 8 }).addTo(map)
+                .bindPopup(d.username);
+        } else {
+            donorMarkers[d.id].setLatLng(latlng);
+        }
+    });
+}
+
+setInterval(fetchLocations, 3000);
+fetchLocations();
+</script>
+{% endblock %}

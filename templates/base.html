@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Blood Donation{% endblock %}</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS & Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
     <style>
-        .navbar { background-color: #000; }
+        body { background-color: #000; color: #fff; }
+        .navbar { background-color: #111; }
         .navbar .nav-link { color: #fff; }
         .navbar .nav-link:hover { color: #ff4d4d; }
         .navbar .nav-link.active { color: #ff0000; font-weight: bold; }
@@ -18,6 +22,7 @@
         .btn-red:hover { background-color: #cc0000; }
         .alert { margin-top: 1rem; }
         .card:hover { transform: scale(1.05); transition: 0.3s; }
+        #map { height: 500px; border-radius: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -41,7 +46,9 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 {% if request.user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+                    </li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blood_camp:dashboard' %}">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blood_camp:camp_list' %}">All Camps</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blood_requests:request_list' %}">All Requests</a></li>
@@ -61,10 +68,60 @@
     </div>
 </nav>
 
-<div class="container mt-4">{% block content %}{% endblock %}</div>
+<div class="container mt-4">
+    {% block content %}{% endblock %}
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Removed live_tracking JS -->
+{% block extra_js %}
+{% if request.user.is_authenticated %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// General live location updates (user profile)
+function sendLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            fetch("{% url 'blood_requests:update_location' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                })
+            });
+        });
+    }
+}
+setInterval(sendLocation, 5000);
+
+// Auto-fill requester lat/lng on create form
+if (document.querySelector("form input[name='requester_lat']") && navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        document.querySelector("input[name='requester_lat']").value = position.coords.latitude;
+        document.querySelector("input[name='requester_lng']").value = position.coords.longitude;
+    });
+}
+</script>
+{% endif %}
+{% endblock %}
 </body>
 </html>

@@ -3,10 +3,49 @@
 
 {% block content %}
 <h2>Create New Blood Request</h2>
-
-<form method="post" style="margin-top: 20px;">
+<form method="post" class="mt-3" id="bloodRequestForm">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn">➕ Submit Request</button>
+    <button type="submit" id="submitBtn" class="btn btn-red" disabled>➕ Submit Request</button>
 </form>
+
+<script>
+// Fill live location in hidden fields and enable submit only after GPS ready
+window.addEventListener('load', function() {
+    const latField = document.getElementById("id_requester_lat");
+    const lngField = document.getElementById("id_requester_lng");
+    const submitBtn = document.getElementById("submitBtn");
+
+    if (!latField || !lngField) {
+        console.error("Latitude or Longitude fields not found!");
+        return;
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                latField.value = position.coords.latitude.toFixed(6);
+                lngField.value = position.coords.longitude.toFixed(6);
+                submitBtn.disabled = false; // Enable submit once GPS ready
+            },
+            function(error) {
+                console.warn("Geolocation error:", error.message);
+                alert("Could not get your live location. Please allow location access.");
+            },
+            { enableHighAccuracy: true }
+        );
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+
+    // Extra safety: prevent submission if location not ready
+    document.getElementById("bloodRequestForm").addEventListener("submit", function(e) {
+        if (!latField.value || !lngField.value) {
+            e.preventDefault();
+            alert("Waiting for your live location. Please allow location access.");
+        }
+    });
+});
+</script>
+
 {% endblock %}
