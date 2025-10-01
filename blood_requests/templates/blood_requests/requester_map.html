@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Requester Location{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-danger mb-4">Requester Location for {{ br.name }}</h2>
+    <div id="map" style="height: 500px; border-radius: 10px;"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const requesterLat = {{ br.requester_lat|default:"null" }};
+const requesterLng = {{ br.requester_lng|default:"null" }};
+
+const mapLat = (requesterLat !== null) ? requesterLat : 17.0;
+const mapLng = (requesterLng !== null) ? requesterLng : 82.0;
+
+const map = L.map('map').setView([mapLat, mapLng], 15);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+if (requesterLat !== null && requesterLng !== null) {
+    L.marker([requesterLat, requesterLng]).addTo(map)
+        .bindPopup("Requester: {{ br.name }}")
+        .openPopup();
+} else {
+    console.warn("Requester coordinates not available; showing default.");
+}
+</script>
+{% endblock %}

@@ -1,13 +1,10 @@
 from django import forms
 from .models import BloodRequest, DonorLocation
 
-# -------------------
 # Blood Request Form
-# -------------------
 class BloodRequestForm(forms.ModelForm):
     class Meta:
         model = BloodRequest
-        # Only include fields that exist in your BloodRequest model
         fields = ["name", "email", "phone", "address", "blood_group", "emergency", "reason", "requester_lat", "requester_lng"]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
@@ -21,18 +18,14 @@ class BloodRequestForm(forms.ModelForm):
             "requester_lng": forms.NumberInput(attrs={"class": "form-control", "step": "any"}),
         }
 
-# -------------------
 # OTP Form
-# -------------------
 class OTPForm(forms.Form):
     otp = forms.CharField(
         max_length=6,
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter OTP"})
     )
 
-# -------------------
 # Share Donor Location Form
-# -------------------
 class ShareLocationForm(forms.ModelForm):
     class Meta:
         model = DonorLocation

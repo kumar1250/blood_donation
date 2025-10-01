@@ -57,22 +57,6 @@ class Notification(models.Model):
         return f"Notification for {self.user.username}: {self.message[:30]}"
 
 # -------------------
-# Donor Live Location (Global)
-# -------------------
-class LiveLocation(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="livelocation"
-    )
-    lat = models.FloatField()
-    lng = models.FloatField()
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.user.username} → ({self.lat}, {self.lng})"
-
-# -------------------
 # Donor Location per Blood Request
 # -------------------
 class DonorLocation(models.Model):

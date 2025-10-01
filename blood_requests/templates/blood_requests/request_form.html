@@ -1,51 +1,121 @@
 {% extends "base.html" %}
-{% block title %}New Blood Request{% endblock %}
+
+{% block title %}Create Blood Request{% endblock %}
 
 {% block content %}
-<h2>Create New Blood Request</h2>
-<form method="post" class="mt-3" id="bloodRequestForm">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" id="submitBtn" class="btn btn-red" disabled>➕ Submit Request</button>
-</form>
+<div class="container mt-4">
+    <h2 class="text-danger mb-4">Create Blood Request</h2>
 
+    <form method="POST" id="bloodRequestForm">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% for error in field.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <!-- Hidden fields for requester location -->
+        <input type="hidden" name="requester_lat" id="id_requester_lat">
+        <input type="hidden" name="requester_lng" id="id_requester_lng">
+
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-plus-circle-fill"></i> Create Request
+        </button>
+        <a href="{% url 'blood_requests:request_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+
+    <div class="mt-3">
+        <input type="text" id="search" class="form-control" placeholder="Search village or city in your district">
+        <button class="btn btn-primary mt-2" type="button" onclick="searchLocation()">Search</button>
+    </div>
+
+    <div id="map" style="height: 400px; border-radius: 10px; margin-top: 15px;"></div>
+    <p class="mt-2"><strong>Tip:</strong> Drag the marker to adjust your location if needed.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// Fill live location in hidden fields and enable submit only after GPS ready
-window.addEventListener('load', function() {
-    const latField = document.getElementById("id_requester_lat");
-    const lngField = document.getElementById("id_requester_lng");
-    const submitBtn = document.getElementById("submitBtn");
+let map, marker;
+const defaultLat = 17.0;  // Fallback latitude
+const defaultLng = 82.0;  // Fallback longitude
 
-    if (!latField || !lngField) {
-        console.error("Latitude or Longitude fields not found!");
-        return;
-    }
+function updateHiddenFields(lat, lng) {
+    document.getElementById("id_requester_lat").value = lat;
+    document.getElementById("id_requester_lng").value = lng;
+}
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                latField.value = position.coords.latitude.toFixed(6);
-                lngField.value = position.coords.longitude.toFixed(6);
-                submitBtn.disabled = false; // Enable submit once GPS ready
-            },
-            function(error) {
-                console.warn("Geolocation error:", error.message);
-                alert("Could not get your live location. Please allow location access.");
-            },
-            { enableHighAccuracy: true }
-        );
-    } else {
-        alert("Geolocation is not supported by your browser.");
-    }
+function initMap(lat, lng) {
+    map = L.map('map').setView([lat, lng], 13);
 
-    // Extra safety: prevent submission if location not ready
-    document.getElementById("bloodRequestForm").addEventListener("submit", function(e) {
-        if (!latField.value || !lngField.value) {
-            e.preventDefault();
-            alert("Waiting for your live location. Please allow location access.");
-        }
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    marker = L.marker([lat, lng], {draggable: true}).addTo(map)
+        .bindPopup("Drag to adjust your exact location")
+        .openPopup();
+
+    updateHiddenFields(lat, lng);
+
+    marker.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        updateHiddenFields(pos.lat, pos.lng);
     });
+}
+
+// Try browser geolocation
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        initMap(position.coords.latitude, position.coords.longitude);
+    }, function(error) {
+        console.warn("Geolocation failed:", error.message);
+        initMap(defaultLat, defaultLng);
+    }, {enableHighAccuracy: true});
+} else {
+    initMap(defaultLat, defaultLng);
+}
+
+// Search (restricted to district bounding box & India)
+function searchLocation() {
+    const query = document.getElementById("search").value.trim();
+    if (!query) { alert("Enter a location"); return; }
+
+    const viewbox = "81.95,16.40,82.05,16.50"; // replace with your district bbox
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&viewbox=${viewbox}&bounded=1&countrycodes=IN`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            map.setView([lat, lng], 15);
+            marker.setLatLng([lat, lng]);
+            updateHiddenFields(lat, lng);
+        } else {
+            alert("Location not found in your district or in India.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Error searching location.");
+    });
+}
+
+// Ensure hidden fields are updated before form submit
+document.getElementById("bloodRequestForm").addEventListener("submit", function(e) {
+    if (marker) {
+        const pos = marker.getLatLng();
+        updateHiddenFields(pos.lat, pos.lng);
+    }
 });
 </script>
-
 {% endblock %}

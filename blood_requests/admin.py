@@ -3,18 +3,13 @@ from .models import BloodRequest, Notification, DonorLocation
 
 @admin.register(BloodRequest)
 class BloodRequestAdmin(admin.ModelAdmin):
-    list_display = ("name", "email", "phone", "emergency", "created_at")
-    list_filter = ("emergency", "created_at")
-    search_fields = ("name", "email", "phone")
+    list_display = ["name", "blood_group", "emergency", "requester", "created_at", "otp_verified"]
+    search_fields = ["name", "blood_group", "requester__username", "email"]
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ("user", "message", "read", "created_at")
-    list_filter = ("read", "created_at")
-    search_fields = ("user__username", "message")
+    list_display = ["user", "message", "created_at", "read"]
 
 @admin.register(DonorLocation)
 class DonorLocationAdmin(admin.ModelAdmin):
-    list_display = ("donor", "blood_request", "lat", "lng", "updated_at")
-    list_filter = ("blood_request", "updated_at")
-    search_fields = ("donor__username",)
+    list_display = ["donor", "blood_request", "lat", "lng", "updated_at"]

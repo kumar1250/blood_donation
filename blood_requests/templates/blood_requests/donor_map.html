@@ -1,46 +1,48 @@
 {% extends "base.html" %}
-{% block title %}Live Donors Map{% endblock %}
+{% block title %}Donor Map{% endblock %}
 
 {% block content %}
-<h2 class="text-danger mb-3">Live Donors Map</h2>
-<div id="map"></div>
+<div class="container mt-4">
+    <h2 class="text-danger mb-4">Donor Map for {{ br.name }}</h2>
+    <div id="map" style="height: 500px; border-radius: 10px;"></div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-let map = L.map('map').setView([20.5937, 78.9629], 5);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+const requesterLat = {{ br.requester_lat|default:"null" }};
+const requesterLng = {{ br.requester_lng|default:"null" }};
+const mapLat = (requesterLat !== null) ? requesterLat : 17.0;
+const mapLng = (requesterLng !== null) ? requesterLng : 82.0;
 
-let requesterMarker = null;
-let donorMarkers = {};
+const map = L.map('map').setView([mapLat, mapLng], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
-async function fetchLocations() {
-    const res = await fetch("{% url 'blood_requests:donor_map' br.id %}?json=1");
-    const data = await res.json();
-
-    if (data.requester) {
-        const latlng = [data.requester.lat, data.requester.lng];
-        if (!requesterMarker) {
-            requesterMarker = L.circleMarker(latlng, { color: data.requester.color, radius: 10 }).addTo(map)
-                .bindPopup(data.requester.username);
-            map.setView(latlng, 14);
-        } else {
-            requesterMarker.setLatLng(latlng);
-        }
-    }
-
-    data.donors.forEach(d => {
-        const latlng = [d.lat, d.lng];
-        if (!donorMarkers[d.id]) {
-            donorMarkers[d.id] = L.circleMarker(latlng, { color: d.color, radius: 8 }).addTo(map)
-                .bindPopup(d.username);
-        } else {
-            donorMarkers[d.id].setLatLng(latlng);
-        }
-    });
+if (requesterLat !== null && requesterLng !== null) {
+    L.marker([requesterLat, requesterLng]).addTo(map).bindPopup("Requester: {{ br.name }}").openPopup();
 }
 
-setInterval(fetchLocations, 3000);
-fetchLocations();
+const donors = [
+    {% for d in br.donor_locations.all %}
+    {username: "{{ d.donor.username }}", lat: {{ d.lat }}, lng: {{ d.lng }}},
+    {% endfor %}
+];
+
+const points = [];
+if (requesterLat !== null && requesterLng !== null) {
+    points.push([requesterLat, requesterLng]);
+}
+donors.forEach(d => {
+    if (d.lat && d.lng) {
+        L.marker([d.lat, d.lng]).addTo(map).bindPopup("Donor: " + d.username);
+        points.push([d.lat, d.lng]);
+    }
+});
+if (points.length > 1) {
+    L.polyline(points, {color: 'red', weight: 3, opacity: 0.7}).addTo(map);
+}
 </script>
 {% endblock %}

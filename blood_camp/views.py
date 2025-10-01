@@ -8,14 +8,13 @@ from .forms import BloodCampForm  # ✅ use the form
 
 
 
-
 @login_required
 def create_camp(request):
     if request.method == "POST":
         form = BloodCampForm(request.POST)
         if form.is_valid():
             camp = form.save(commit=False)
-            camp.created_by = request.user
+            camp.organizer = request.user   # ✅ assign logged-in user
             camp.save()
             messages.success(request, "✅ Blood camp created successfully!")
             return redirect("blood_camp:camp_list")

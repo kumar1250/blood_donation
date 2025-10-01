@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.core.mail import send_mail
 from django.conf import settings
 import random
-
+from django.contrib.auth import logout
 from django.contrib.auth import get_user_model
 from .models import Follow
 from .forms import RegisterForm
@@ -121,3 +121,13 @@ def followers_list(request):
         "followers": followers,
         "following": following
     })
+
+@login_required
+def user_logout(request):
+    # Accept POST only for logout to be secure
+    if request.method == "POST":
+        logout(request)
+        messages.success(request, "✅ You have successfully logged out.")
+        return redirect("accounts:login")
+    # For any GET request, redirect somewhere safe (home)
+    return redirect("home")
