@@ -1,5 +1,6 @@
 # settings.py
 from pathlib import Path
+import os
 from django.urls import reverse_lazy
 
 # ---------------------------
@@ -134,6 +135,7 @@ USE_TZ = True
 # Static Files
 # ---------------------------
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")] 
 STATICFILES_DIRS = [BASE_DIR / "static"]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -1,36 +1,115 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
+
 <div class="container mt-5">
     <h1 class="mb-4 text-danger">Welcome, {{ request.user.username }}!</h1>
+    
+    <h3 class="mt-4 mb-3 text-danger">Quick Actions - Carousel</h3>
 
-    <h3 class="mt-4 mb-3 text-danger">Quick Actions</h3>
+    <!-- Carousel Wrapper -->
+    <div id="quickActionsCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="2500">
+        <div class="carousel-inner">
+
+            <!-- Slide 1 -->
+            <div class="carousel-item active">
+                <a href="{% url 'blood_requests:request_form' %}" class="card text-white h-100 text-center text-decoration-none" style="background-image: url('/static/images/bg1.jpg'); background-size: cover; background-position: center;">
+                    <div class="card-body py-5" style="background: rgba(0,0,0,0.5);">
+                        <i class="bi bi-plus-circle-fill fs-1"></i>
+                        <h5 class="mt-3" style="font-family: 'Arial', sans-serif;">Create Blood Request</h5>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="carousel-item">
+                <a href="{% url 'blood_requests:request_list' %}" class="card text-white h-100 text-center text-decoration-none" style="background-image: url('/static/images/bg2.jpg'); background-size: cover; background-position: center;">
+                    <div class="card-body py-5" style="background: rgba(0,0,0,0.5);">
+                        <i class="bi bi-list-ul fs-1"></i>
+                        <h5 class="mt-3" style="font-family: 'Verdana', sans-serif;">View All Requests</h5>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="carousel-item">
+                <a href="{% url 'blood_camp:create_camp' %}" class="card text-white h-100 text-center text-decoration-none" style="background-image: url('/static/images/bg3.jpg'); background-size: cover; background-position: center;">
+                    <div class="card-body py-5" style="background: rgba(0,0,0,0.5);">
+                        <i class="bi bi-plus-square-fill fs-1"></i>
+                        <h5 class="mt-3" style="font-family: 'Georgia', serif;">Create Blood Camp</h5>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="carousel-item">
+                <a href="{% url 'blood_camp:camp_list' %}" class="card text-white h-100 text-center text-decoration-none" style="background-image: url('/static/images/bg4.jpg'); background-size: cover; background-position: center;">
+                    <div class="card-body py-5" style="background: rgba(0,0,0,0.5);">
+                        <i class="bi bi-geo-alt-fill fs-1"></i>
+                        <h5 class="mt-3" style="font-family: 'Tahoma', sans-serif;">View All Camps</h5>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="carousel-item">
+                <a href="{% url 'chat:chat_home' %}" class="card text-white h-100 text-center text-decoration-none" style="background-image: url('/static/images/bg5.jpg'); background-size: cover; background-position: center;">
+                    <div class="card-body py-5" style="background: rgba(0,0,0,0.5);">
+                        <i class="bi bi-chat-dots-fill fs-1"></i>
+                        <h5 class="mt-3" style="font-family: 'Courier New', monospace;">Chat</h5>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#quickActionsCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#quickActionsCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+
+    <!-- Normal Plates / Buttons -->
+    <h3 class="mt-5 mb-3 text-danger">Quick Actions - Buttons</h3>
     <div class="row g-4">
         <div class="col-md-4 col-sm-6">
-            <a href="{% url 'blood_requests:request_form' %}" class="card text-white bg-danger h-100 text-center text-decoration-none">
-                <div class="card-body py-4"><i class="bi bi-plus-circle-fill fs-1"></i><h5 class="mt-3">Create Blood Request</h5></div>
-            </a>
+            <a href="{% url 'blood_requests:request_form' %}" class="btn btn-danger btn-lg w-100 py-4 text-white" style="font-weight:bold; font-family:'Arial', sans-serif;">Create Blood Request</a>
         </div>
         <div class="col-md-4 col-sm-6">
-            <a href="{% url 'blood_requests:request_list' %}" class="card text-white bg-danger h-100 text-center text-decoration-none">
-                <div class="card-body py-4"><i class="bi bi-list-ul fs-1"></i><h5 class="mt-3">View All Requests</h5></div>
-            </a>
+            <a href="{% url 'blood_requests:request_list' %}" class="btn btn-danger btn-lg w-100 py-4 text-white" style="font-weight:bold; font-family:'Verdana', sans-serif;">View All Requests</a>
         </div>
         <div class="col-md-4 col-sm-6">
-            <a href="{% url 'blood_camp:create_camp' %}" class="card text-white bg-danger h-100 text-center text-decoration-none">
-                <div class="card-body py-4"><i class="bi bi-plus-square-fill fs-1"></i><h5 class="mt-3">Create Blood Camp</h5></div>
-            </a>
+            <a href="{% url 'blood_camp:create_camp' %}" class="btn btn-danger btn-lg w-100 py-4 text-white" style="font-weight:bold; font-family:'Georgia', serif;">Create Blood Camp</a>
         </div>
         <div class="col-md-4 col-sm-6">
-            <a href="{% url 'blood_camp:camp_list' %}" class="card text-white bg-danger h-100 text-center text-decoration-none">
-                <div class="card-body py-4"><i class="bi bi-geo-alt-fill fs-1"></i><h5 class="mt-3">View All Camps</h5></div>
-            </a>
+            <a href="{% url 'blood_camp:camp_list' %}" class="btn btn-danger btn-lg w-100 py-4 text-white" style="font-weight:bold; font-family:'Tahoma', sans-serif;">View All Camps</a>
         </div>
         <div class="col-md-4 col-sm-6">
-            <a href="{% url 'chat:chat_home' %}" class="card text-white bg-danger h-100 text-center text-decoration-none">
-                <div class="card-body py-4"><i class="bi bi-chat-dots-fill fs-1"></i><h5 class="mt-3">Chat</h5></div>
-            </a>
+            <a href="{% url 'chat:chat_home' %}" class="btn btn-danger btn-lg w-100 py-4 text-white" style="font-weight:bold; font-family:'Courier New', monospace;">Chat</a>
         </div>
     </div>
 </div>
+
 {% endblock %}
+
+<!-- Custom CSS -->
+<style>
+.carousel-item .card {
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    transition: transform 0.3s;
+}
+.carousel-item .card:hover {
+    transform: scale(1.05);
+}
+.carousel-item h5 {
+    font-weight: bold;
+    color: #FFD700;
+}
+.btn:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s;
+}
+</style>
