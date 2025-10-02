@@ -3,6 +3,10 @@
 
 {% block content %}
 <div class="container mt-4">
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
     <h2 class="mb-4 text-danger">🩸 Blood Camps Dashboard</h2>
 
     <!-- Quick Actions -->
@@ -17,7 +21,11 @@
     <!-- Stats Cards -->
     <div class="row mb-4 g-3">
         <div class="col-md-4 col-sm-6">
+<<<<<<< HEAD
             <div class="card text-white bg-danger h-100">
+=======
+            <div class="card h-100 text-white shadow-sm" style="background: linear-gradient(135deg, #ff4d4d, #b30000);">
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Blood Camps</h5>
                     <p class="card-text fs-3">{{ total_camps }}</p>
@@ -25,7 +33,11 @@
             </div>
         </div>
         <div class="col-md-4 col-sm-6">
+<<<<<<< HEAD
             <div class="card text-white bg-primary h-100">
+=======
+            <div class="card h-100 text-white shadow-sm" style="background: linear-gradient(135deg, #4da6ff, #0059b3);">
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
                 <div class="card-body text-center">
                     <h5 class="card-title">Upcoming Camps</h5>
                     <p class="card-text fs-3">{{ upcoming_camps }}</p>
@@ -33,7 +45,11 @@
             </div>
         </div>
         <div class="col-md-4 col-sm-6">
+<<<<<<< HEAD
             <div class="card text-white bg-success h-100">
+=======
+            <div class="card h-100 text-white shadow-sm" style="background: linear-gradient(135deg, #33cc33, #006600);">
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Blood Requests</h5>
                     <p class="card-text fs-3">{{ total_requests }}</p>
@@ -42,6 +58,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Recent Camps -->
     <h4 class="mt-4 mb-3 text-danger">Recent Blood Camps</h4>
     {% if recent_camps %}
@@ -94,5 +111,81 @@
         .btn { font-size: 0.85rem; }
         h2, h4 { font-size: 1.3rem; }
     }
+=======
+    <!-- Recent Blood Camps -->
+    {% if recent_camps %}
+    <h4 class="mt-4 mb-3 text-danger">Recent Blood Camps</h4>
+    <div class="row g-3">
+        {% for camp in recent_camps %}
+        <div class="col-md-4 col-sm-6">
+            <div class="card shadow-sm h-100" style="border-radius: 15px; background-color: rgba(255,255,255,0.05);">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">{{ camp.name }}</h5>
+                    <p class="card-text">📍 {{ camp.venue }}, {{ camp.city }}<br>📅 {{ camp.date }} at {{ camp.time }}</p>
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <a href="{% url 'blood_camp:camp_detail' camp.id %}" class="btn btn-sm btn-primary">View</a>
+                        {% if request.user == camp.organizer %}
+                        <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        <a href="{% url 'blood_camp:delete_camp' camp.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Recent Blood Requests -->
+    {% if recent_requests %}
+    <h4 class="mt-5 mb-3 text-danger">Recent Blood Requests</h4>
+    <div class="row g-3">
+        {% for req in recent_requests %}
+        <div class="col-md-4 col-sm-6">
+            <div class="card shadow-sm h-100" style="border-radius: 15px; background-color: rgba(255,255,255,0.05);">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">{{ req.patient_name }} - {{ req.blood_group }}</h5>
+                    <p class="card-text">📍 {{ req.city }}<br>Requested at: {{ req.created_at|date:"M d, Y H:i" }}</p>
+                    <a href="{% url 'blood_requests:request_list' %}" class="btn btn-sm btn-info">View</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Accepted Blood Requests -->
+    {% if accepted_requests %}
+    <h4 class="mt-5 mb-3 text-success">Accepted Blood Requests</h4>
+    <div class="row g-3">
+        {% for req in accepted_requests %}
+        <div class="col-md-4 col-sm-6">
+            <div class="card shadow-sm h-100" style="border-radius: 15px; background-color: rgba(0,128,0,0.1);">
+                <div class="card-body">
+                    <h5 class="card-title text-success">{{ req.patient_name }} - {{ req.blood_group }}</h5>
+                    <p class="card-text">
+                        📍 {{ req.city }}<br>
+                        Accepted on: {{ req.accepted_at|date:"M d, Y H:i" }}<br>
+                        Donor: {{ req.donor.username }}
+                    </p>
+                    <a href="{% url 'blood_requests:request_list' %}" class="btn btn-sm btn-success">View</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
+
+@media (max-width: 576px) {
+    .card-text { font-size: 1rem; }
+    .btn { font-size: 0.85rem; padding: 0.4rem 0.6rem; }
+    h2, h4 { font-size: 1.2rem; }
+}
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 </style>
 {% endblock %}

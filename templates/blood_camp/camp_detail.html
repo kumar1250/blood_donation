@@ -3,7 +3,11 @@
 
 {% block content %}
 <div class="container mt-5">
+<<<<<<< HEAD
     <div class="card shadow-sm">
+=======
+    <div class="card shadow-sm" style="background-color: rgba(255,255,255,0.05); border-radius: 15px;">
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
         <div class="card-body">
             <h2 class="mb-3 text-danger">{{ camp.title }}</h2>
             
@@ -14,15 +18,30 @@
             
             <p><strong>Organized by:</strong> {{ camp.organized_by }}</p>
 
+<<<<<<< HEAD
             <div class="mt-4 d-flex gap-2 flex-wrap">
                 <a href="{% url 'blood_camp:camp_list' %}" class="btn btn-secondary">Back to Camps List</a>
                 <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn btn-primary">Edit Camp</a>
                 <a href="{% url 'blood_camp:delete_camp' camp.id %}" class="btn btn-danger">Delete Camp</a>
+=======
+            {% if camp.latitude and camp.longitude %}
+            <a href="https://www.google.com/maps/dir/?api=1&destination={{ camp.latitude }},{{ camp.longitude }}" 
+               target="_blank" class="btn btn-info mt-2">
+                🌐 Get Directions
+            </a>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-2 flex-wrap">
+                <a href="{% url 'blood_camp:camp_list' %}" class="btn btn-secondary btn-red-hover">Back to Camps List</a>
+                <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn btn-primary btn-red-hover">Edit Camp</a>
+                <a href="{% url 'blood_camp:delete_camp' camp.id %}" class="btn btn-danger btn-red-hover">Delete Camp</a>
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
             </div>
         </div>
     </div>
 </div>
 
+<<<<<<< HEAD
 <!-- Optional: small custom styles -->
 <style>
     .card { border-radius: 10px; }
@@ -30,6 +49,41 @@
         h2 { font-size: 1.5rem; }
         p { font-size: 0.9rem; }
         .btn { font-size: 0.9rem; }
+=======
+<!-- Custom styles for better readability on background -->
+<style>
+    .card {
+        border-radius: 15px;
+        background-color: rgba(0,0,0,0.6); /* Darker overlay for text readability */
+        color: #fff;
+    }
+    h2 { 
+        font-weight: bold; 
+        color: #FFD700; 
+    }
+    p {
+        color: #fff;
+        font-size: 1rem;
+    }
+    .btn-red-hover:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s;
+    }
+    .btn-info {
+        background-color: #007bff;
+        color: #fff;
+    }
+    .btn-info:hover {
+        background-color: #0056b3;
+        color: #fff;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 576px) {
+        h2 { font-size: 1.5rem; }
+        p { font-size: 0.9rem; }
+        .btn { font-size: 0.9rem; padding: 0.5rem 0.8rem; }
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
     }
 </style>
 {% endblock %}

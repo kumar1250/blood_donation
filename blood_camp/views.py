@@ -25,11 +25,17 @@ def create_camp(request):
 
     return render(request, "blood_camp/create_camp.html", {"form": form})
 
+<<<<<<< HEAD
+=======
+from django.utils import timezone
+from datetime import timedelta
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 
 @login_required
 def camp_list(request):
     """
     List all upcoming blood camps and today's camps.
+<<<<<<< HEAD
     Automatically deletes past camps.
     """
     # Delete all past camps
@@ -47,6 +53,30 @@ def dashboard(request):
     return render(request, "blood_camp/dashboard.html", {"camps": camps, "requests": requests})
 
 
+=======
+    Automatically deletes camps older than yesterday.
+    """
+    # Delete camps older than yesterday
+    yesterday = timezone.now().date() - timedelta(days=1)
+    BloodCamp.objects.filter(date__lt=yesterday).delete()
+    
+    # Fetch upcoming and today's camps, ordered by date
+    camps = BloodCamp.objects.filter(date__gte=yesterday).order_by("date")
+    
+    return render(request, "blood_camp/camp_list.html", {"camps": camps})
+
+@login_required
+def dashboard(request):
+    # Delete camps older than yesterday
+    yesterday = timezone.now().date() - timedelta(days=1)
+    BloodCamp.objects.filter(date__lt=yesterday).delete()
+    
+    camps = BloodCamp.objects.filter(date__gte=yesterday).order_by("date")
+    requests = BloodRequest.objects.all().order_by("-created_at")
+    
+    return render(request, "blood_camp/dashboard.html", {"camps": camps, "requests": requests})
+
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 @login_required
 def delete_camp(request, camp_id):
     camp = get_object_or_404(BloodCamp, id=camp_id)

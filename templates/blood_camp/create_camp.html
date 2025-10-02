@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="container mt-5">
+<<<<<<< HEAD
     <div class="card shadow-sm">
         <div class="card-body">
             <h2 class="mb-4 text-danger">🩸 Create New Blood Camp</h2>
@@ -12,6 +13,15 @@
             <form method="POST" class="row g-3">
                 {% csrf_token %}
                 
+=======
+    <div class="card shadow-sm" style="background-color: rgba(0,0,0,0.6); border-radius:15px; color:#fff;">
+        <div class="card-body">
+            <h2 class="mb-4 text-warning">🩸 Create New Blood Camp</h2>
+
+            <form method="POST" class="row g-3">
+                {% csrf_token %}
+
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
                 {% for field in form %}
                     <div class="col-md-6 mb-3">
                         <label class="form-label">{{ field.label }}</label>
@@ -25,6 +35,22 @@
                     </div>
                 {% endfor %}
 
+<<<<<<< HEAD
+=======
+                <!-- Live Location Button -->
+                <div class="col-12 mb-3">
+                    <button type="button" id="detect-location" class="btn btn-warning">
+                        📍 Use My Current Location
+                    </button>
+                </div>
+
+                <!-- Map for selecting coordinates -->
+                <div class="col-12 mb-3">
+                    <label class="form-label">Select Location on Map</label>
+                    <div id="camp-map" style="height: 400px; border-radius:10px;"></div>
+                </div>
+
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
                 <div class="col-12 d-grid gap-2 d-md-flex">
                     <button type="submit" class="btn btn-red me-md-2">Create Camp</button>
                     <a href="{% url 'blood_camp:camp_list' %}" class="btn btn-secondary">Cancel</a>
@@ -34,9 +60,109 @@
     </div>
 </div>
 
+<<<<<<< HEAD
 <style>
     input, select, textarea { border-radius: 5px; }
     .btn-red { background-color: #ff0000; color: #fff; transition: 0.3s; }
     .btn-red:hover { background-color: #cc0000; color: #fff; }
+=======
+<!-- Leaflet JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var defaultLat = 17.0;
+    var defaultLng = 82.0;
+
+    // Initialize map
+    var map = L.map('camp-map').setView([defaultLat, defaultLng], 6);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Draggable marker
+    var marker = L.marker([defaultLat, defaultLng], {draggable:true}).addTo(map);
+
+    // Accuracy circle
+    var accuracyCircle = L.circle([defaultLat, defaultLng], {
+        radius: 0,
+        color: 'blue',
+        fillColor: '#blue',
+        fillOpacity: 0.2
+    }).addTo(map);
+
+    function updateLatLng(lat, lng, accuracy=0) {
+        document.getElementById("id_latitude").value = lat.toFixed(6);
+        document.getElementById("id_longitude").value = lng.toFixed(6);
+        accuracyCircle.setLatLng([lat, lng]);
+        accuracyCircle.setRadius(accuracy);
+    }
+
+    // Marker drag
+    marker.on('dragend', function(e) {
+        var pos = marker.getLatLng();
+        updateLatLng(pos.lat, pos.lng);
+    });
+
+    // Map click
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateLatLng(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Live location tracking
+    function startLiveTracking() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                var accuracy = position.coords.accuracy;
+
+                marker.setLatLng([lat, lng]);
+                map.setView([lat, lng], 15);
+                updateLatLng(lat, lng, accuracy);
+            }, function(error) {
+                console.warn("Unable to track location: " + error.message);
+            }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 });
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
+    }
+
+    // Start tracking immediately
+    startLiveTracking();
+
+    // Button click triggers tracking as well
+    document.getElementById("detect-location").addEventListener("click", startLiveTracking);
+});
+</script>
+
+<style>
+input, select, textarea { 
+    border-radius: 5px; 
+    background-color: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid #ccc;
+}
+input::placeholder, textarea::placeholder { color: #eee; }
+
+.btn-red { 
+    background-color: #ff0000; 
+    color: #fff; 
+    font-weight: bold;
+    transition: 0.3s; 
+}
+.btn-red:hover { background-color: #cc0000; color: #fff; }
+
+.form-label { color: #FFD700; font-weight: bold; }
+.form-text { color: #ccc; }
+
+#detect-location {
+    font-weight: bold;
+}
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 </style>
 {% endblock %}

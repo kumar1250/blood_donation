@@ -69,6 +69,7 @@ var markers = {};
 
 {% for camp in camps %}
     {% if camp.latitude and camp.longitude %}
+<<<<<<< HEAD
         var popupContent = `
             <div style="max-width: 300px; font-family:sans-serif;">
                 <h5 class="text-danger fw-bold">{{ camp.name }}</h5>
@@ -84,6 +85,29 @@ var markers = {};
                 </p>
             </div>
         `;
+=======
+        var googleLink = `https://www.google.com/maps/dir/?api=1&destination={{ camp.latitude }},{{ camp.longitude }}`;
+
+        var popupContent = `
+            <div style="max-width: 300px; font-family:'Poppins', sans-serif;">
+                <div style="border:1px solid #dc3545; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.25); padding:12px; background:#fff;">
+                    <h5 style="color:#b30000; font-weight:700; margin-bottom:8px; border-bottom:1px solid #b30000; padding-bottom:3px;">{{ camp.name }}</h5>
+                    <p style="margin:0; line-height:1.5rem; color:#333;">
+                        <strong>Organized by:</strong> {{ camp.organized_by }}<br>
+                        <strong>Date & Time:</strong> {{ camp.date }} at {{ camp.time }}<br>
+                        <strong>Venue:</strong> {{ camp.venue }}<br>
+                        <strong>City:</strong> {{ camp.city }}<br>
+                        <strong>Contact:</strong> {{ camp.contact_person }} ({{ camp.contact_phone }})<br>
+                        <strong>Age Range:</strong> {{ camp.min_age }} - {{ camp.max_age }} yrs<br>
+                        <strong>Min Weight:</strong> {{ camp.min_weight }} kg<br>
+                        <strong>Notes:</strong> {{ camp.notes|default:"N/A" }}
+                    </p>
+                    <a href="${googleLink}" target="_blank" style="display:inline-block; margin-top:8px; padding:5px 10px; background:#b30000; color:#fff; border-radius:6px; font-size:0.85rem; text-decoration:none;">🚗 Get Directions</a>
+                </div>
+            </div>
+        `;
+
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
         markers[{{ camp.id }}] = L.marker([{{ camp.latitude }}, {{ camp.longitude }}])
             .addTo(map)
             .bindPopup(popupContent);
@@ -104,5 +128,8 @@ function panMap(x, y){
     map.panBy([x, y], {animate:true});
 }
 </script>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 {% endblock %}

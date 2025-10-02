@@ -1,10 +1,104 @@
 {% extends "base.html" %}
 {% block title %}Requester Location{% endblock %}
 
+<<<<<<< HEAD
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-danger mb-4">Requester Location for {{ br.name }}</h2>
     <div id="map" style="height: 500px; border-radius: 10px;"></div>
+=======
+{% block extra_css %}
+<style>
+    /* Gradient heading */
+    .requester-map-page h2 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        background: linear-gradient(90deg, #b30000, #ff4d4d);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Map container with shadow */
+    #map {
+        height: 500px;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        border: 2px solid #b30000;
+    }
+
+    /* Card container */
+    .map-card {
+        background: #fff5f5;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Floating info box */
+    .info-box {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        background: #fff;
+        border-left: 5px solid #b30000;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    .info-box p {
+        margin: 5px 0;
+        font-size: 14px;
+    }
+
+    .info-box strong {
+        color: #b30000;
+    }
+
+    /* Popup text */
+    .leaflet-popup-content {
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        color: #222;
+    }
+
+    /* Popup button */
+    .leaflet-popup-content a.btn-directions {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 5px 10px;
+        background: #b30000;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 13px;
+        text-decoration: none;
+    }
+    .leaflet-popup-content a.btn-directions:hover {
+        background: #800000;
+    }
+
+    /* Zoom control position */
+    .leaflet-control-zoom {
+        margin-bottom: 30px;
+        margin-right: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 requester-map-page">
+    <div class="map-card">
+        <h2 class="mb-3">📍 Requester Location</h2>
+        <div id="map"></div>
+
+        <!-- Floating info box -->
+        <div class="info-box mt-3">
+            <p><strong>Name:</strong> {{ br.name }}</p>
+            <p><strong>Email:</strong> {{ br.email|default:"N/A" }}</p>
+            <p><strong>Phone:</strong> {{ br.phone|default:"N/A" }}</p>
+            <p><strong>Reason:</strong> {{ br.reason|default:"N/A" }}</p>
+            <p><strong>Address:</strong> {{ br.address|default:"N/A" }}</p>
+        </div>
+    </div>
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 </div>
 {% endblock %}
 
@@ -17,15 +111,38 @@ const requesterLng = {{ br.requester_lng|default:"null" }};
 const mapLat = (requesterLat !== null) ? requesterLat : 17.0;
 const mapLng = (requesterLng !== null) ? requesterLng : 82.0;
 
+<<<<<<< HEAD
 const map = L.map('map').setView([mapLat, mapLng], 15);
 
+=======
+const map = L.map('map', { zoomControl: false }).setView([mapLat, mapLng], 15);
+
+// Add tiles
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
+<<<<<<< HEAD
 if (requesterLat !== null && requesterLng !== null) {
     L.marker([requesterLat, requesterLng]).addTo(map)
         .bindPopup("Requester: {{ br.name }}")
+=======
+// Add zoom control at bottom-right
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+if (requesterLat !== null && requesterLng !== null) {
+    const googleMapsUrl = `https://www.google.com/maps?q=${requesterLat},${requesterLng}`;
+    
+    L.marker([requesterLat, requesterLng])  // ✅ Normal Leaflet red marker
+        .addTo(map)
+        .bindPopup(`
+            <b>{{ br.name }}</b><br>
+            📞 {{ br.phone|default:"N/A" }}<br>
+            📧 {{ br.email|default:"N/A" }}<br>
+            <a href="${googleMapsUrl}" target="_blank" class="btn-directions">🚗 Get Directions</a>
+        `)
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
         .openPopup();
 } else {
     console.warn("Requester coordinates not available; showing default.");

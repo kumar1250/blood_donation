@@ -2,13 +2,20 @@
 {% block title %}All Blood Camps{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <h2>All Blood Camps</h2>
 
 <a href="{% url 'blood_camp:create_camp' %}" class="btn" style="background-color:red; color:#fff; margin-bottom:15px;">
+=======
+<h2 class="mb-4 text-warning">All Blood Camps</h2>
+
+<a href="{% url 'blood_camp:create_camp' %}" class="btn btn-danger mb-4">
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
     + Create New Camp
 </a>
 
 {% if camps %}
+<<<<<<< HEAD
     <div class="row">
         {% for camp in camps %}
         <div class="col-md-6 mb-3">
@@ -45,4 +52,72 @@
     <p>No upcoming blood camps available.</p>
 {% endif %}
 
+=======
+<div class="row">
+    {% for camp in camps %}
+    <div class="col-md-6 mb-4">
+        <div class="camp-card p-3 rounded shadow-sm">
+            <h5 class="camp-title">{{ camp.name }}</h5>
+            <p><strong>Organized By:</strong> {{ camp.organized_by }}</p>
+            <p><strong>Date & Time:</strong> {{ camp.date }} | {{ camp.time }}</p>
+            <p><strong>Venue:</strong> {{ camp.venue }}</p>
+            <p><strong>Contact:</strong> {{ camp.contact_person }} | {{ camp.contact_phone }}</p>
+            <p><strong>Eligibility:</strong> Age {{ camp.min_age }}-{{ camp.max_age }}, Weight ≥ {{ camp.min_weight }}kg</p>
+            {% if camp.notes %}
+            <p><strong>Notes:</strong> {{ camp.notes }}</p>
+            {% endif %}
+
+            <!-- Google Maps Link -->
+            {% if camp.latitude and camp.longitude %}
+            <a href="https://www.google.com/maps/dir/?api=1&destination={{ camp.latitude }},{{ camp.longitude }}" 
+               target="_blank" class="btn btn-info btn-sm mt-2">
+                🌐 Get Directions
+            </a>
+            {% endif %}
+
+            <!-- Edit/Delete Buttons for Camp Owner -->
+            {% if request.user == camp.organizer %}
+            <div class="mt-2">
+                <a href="{% url 'blood_camp:edit_camp' camp.id %}" class="btn btn-warning btn-sm me-2">✏ Edit</a>
+                <form action="{% url 'blood_camp:delete_camp' camp.id %}" method="POST" style="display:inline;"
+                      onsubmit="return confirm('Are you sure you want to delete this camp?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No upcoming blood camps available.</p>
+{% endif %}
+
+<style>
+.camp-card {
+    background-color: #111;
+    color: #fff;
+    border: 1px solid #333;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.camp-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255,0,0,0.5);
+}
+.camp-title {
+    color: #ff4d4d;
+    font-weight: bold;
+}
+.btn-info {
+    background-color: #007bff;
+    color: #fff;
+    transition: 0.3s;
+}
+.btn-info:hover {
+    background-color: #0056b3;
+    color: #fff;
+}
+</style>
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 {% endblock %}

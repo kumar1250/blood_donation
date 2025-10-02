@@ -1,14 +1,81 @@
 {% extends "base.html" %}
 {% block title %}Donor Map{% endblock %}
 
+<<<<<<< HEAD
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-danger mb-4">Donor Map for {{ br.name }}</h2>
     <div id="map" style="height: 500px; border-radius: 10px;"></div>
+=======
+{% block extra_css %}
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Leaflet Marker Cluster CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+<style>
+.donor-map-page {
+    font-family: 'Poppins', sans-serif;
+}
+
+.donor-map-page h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    background: linear-gradient(90deg, #b30000, #ff4d4d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#map {
+    height: 550px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    border: 2px solid #b30000;
+}
+
+.leaflet-popup-content {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+}
+
+.leaflet-popup-content .card {
+    min-width: 220px;
+    border-radius: 10px;
+}
+
+.leaflet-popup-content .card-header {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.leaflet-popup-content a.btn-directions {
+    text-decoration: none;
+    color: white;
+    background-color: #b30000;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-top: 5px;
+}
+.leaflet-popup-content a.btn-directions:hover {
+    background-color: #800000;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 donor-map-page">
+    <h2 class="mb-4">📍 Donor Map for {{ br.name }}</h2>
+    <div id="map"></div>
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<<<<<<< HEAD
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const requesterLat = {{ br.requester_lat|default:"null" }};
@@ -17,10 +84,25 @@ const mapLat = (requesterLat !== null) ? requesterLat : 17.0;
 const mapLng = (requesterLng !== null) ? requesterLng : 82.0;
 
 const map = L.map('map').setView([mapLat, mapLng], 13);
+=======
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- MarkerCluster -->
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<script>
+const requesterLat = {{ br.requester_lat|default:"null" }};
+const requesterLng = {{ br.requester_lng|default:"null" }};
+const defaultLat = 17.0;
+const defaultLng = 82.0;
+
+const map = L.map('map').setView([requesterLat || defaultLat, requesterLng || defaultLng], 13);
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
+<<<<<<< HEAD
 if (requesterLat !== null && requesterLng !== null) {
     L.marker([requesterLat, requesterLng]).addTo(map).bindPopup("Requester: {{ br.name }}").openPopup();
 }
@@ -43,6 +125,77 @@ donors.forEach(d => {
 });
 if (points.length > 1) {
     L.polyline(points, {color: 'red', weight: 3, opacity: 0.7}).addTo(map);
+=======
+// Marker cluster group
+const markers = L.markerClusterGroup();
+
+// Function to create normal markers with popup
+function createMarker(lat, lng, popupHtml){
+    const googleMapsLink = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    return L.marker([lat, lng]).bindPopup(`
+        <div class="card text-dark">
+            <div class="card-header bg-primary text-white">
+                Location
+            </div>
+            <div class="card-body p-2">
+                ${popupHtml}
+                <a href="${googleMapsLink}" target="_blank" class="btn-directions">🚗 Get Directions</a>
+            </div>
+        </div>
+    `);
+}
+
+// Add requester marker
+if(requesterLat && requesterLng){
+    const requesterPopup = `
+        <p><b>Name:</b> {{ br.name }}</p>
+        <p><b>Blood Group:</b> {{ br.blood_group }}</p>
+        <p><b>Phone:</b> {{ br.phone }}</p>
+        <p><b>Email:</b> {{ br.email }}</p>
+    `;
+    markers.addLayer(createMarker(requesterLat, requesterLng, requesterPopup));
+}
+
+// Donor markers
+const donors = [
+    {% for d in br.donor_locations.all %}
+    {
+        username: "{{ d.donor.username }}",
+        blood_group: "{{ d.donor.blood_group }}",
+        phone: "{{ d.donor.phone }}",
+        email: "{{ d.donor.email }}",
+        lat: {{ d.lat }},
+        lng: {{ d.lng }}
+    },
+    {% endfor %}
+];
+
+donors.forEach(d => {
+    if(d.lat && d.lng){
+        const donorPopup = `
+            <p><b>Name:</b> ${d.username}</p>
+            <p><b>Blood Group:</b> ${d.blood_group}</p>
+            <p><b>Phone:</b> ${d.phone}</p>
+            <p><b>Email:</b> ${d.email}</p>
+        `;
+        markers.addLayer(createMarker(d.lat, d.lng, donorPopup));
+    }
+});
+
+map.addLayer(markers);
+
+// Fit map bounds
+if(markers.getLayers().length > 0){
+    map.fitBounds(markers.getBounds(), {padding: [50,50]});
+}
+
+// Optional: draw polyline from requester to donors
+const polyPoints = [];
+if(requesterLat && requesterLng) polyPoints.push([requesterLat, requesterLng]);
+donors.forEach(d => { if(d.lat && d.lng) polyPoints.push([d.lat, d.lng]); });
+if(polyPoints.length > 1){
+    L.polyline(polyPoints, {color: 'blue', weight: 2, opacity: 0.5}).addTo(map);
+>>>>>>> 6942391 (Initial commit: Updated project with new files and blood camp changes blood camp)
 }
 </script>
 {% endblock %}

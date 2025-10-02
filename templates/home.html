@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ user.username }} 👋</h2>
+<p>Select an option below:</p>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>📝 New Request</h4>
+            <p>Create a new blood request.</p>
+            <!-- ✅ Correct URL name -->
+            <a class="btn btn-primary" href="{% url 'create_request' %}">Create Request</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>📋 Request List</h4>
+            <p>See all blood requests.</p>
+            <a class="btn btn-success" href="{% url 'request_list' %}">View Requests</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>💬 Chat</h4>
+            <p>Chat with other users.</p>
+            <a class="btn btn-warning" href="{% url 'chat_home' %}">Go to Chat</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
